@@ -1,0 +1,70 @@
+{
+  "project_info": {
+    "project_number": "405169333105",
+    "project_id": "bluetooth-app-dffd5",
+    "storage_bucket": "bluetooth-app-dffd5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:405169333105:android:4f29c997392ca0e1eb8cd0",
+        "android_client_info": {
+          "package_name": "com.example.bluetooth_app_v1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "405169333105-aq4jki59866o29559dfv7q3148io5euk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bluetooth_app_v1",
+            "certificate_hash": "0e62f84753d43159dbdbb30aff07649bad7ffeb9"
+          }
+        },
+        {
+          "client_id": "405169333105-odc13jar5qg3rbpkigsk1hdhfoo4oul9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bluetooth_app_v1",
+            "certificate_hash": "c5268ca0747237be73992f2a2d07dcc382f8ed91"
+          }
+        },
+        {
+          "client_id": "405169333105-skavu1n3ftdq5hehko3cbgrlo2cn9mp4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bluetooth_app_v1",
+            "certificate_hash": "52de425bbe734a3edff75f956aded4aaef942eea"
+          }
+        },
+        {
+          "client_id": "405169333105-6kmmghj71if99dv1l3juhiiuoe97b983.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfnJfRhIgnmrpjCbhxkEppPh-j2tRtvko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "405169333105-6kmmghj71if99dv1l3juhiiuoe97b983.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "405169333105-vdt7c35quonl6a4pfcml7dcpjqmau7fr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.bluetoothAppV1"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

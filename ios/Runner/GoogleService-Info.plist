@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>405169333105-vdt7c35quonl6a4pfcml7dcpjqmau7fr.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.405169333105-vdt7c35quonl6a4pfcml7dcpjqmau7fr</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCG2NaIL5_TpxIu0EkNJzfMn7IIu0hQ4Do</string>
+	<key>GCM_SENDER_ID</key>
+	<string>405169333105</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.bluetoothAppV1</string>
+	<key>PROJECT_ID</key>
+	<string>bluetooth-app-dffd5</string>
+	<key>STORAGE_BUCKET</key>
+	<string>bluetooth-app-dffd5.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:405169333105:ios:b8f1cedf530b3d72eb8cd0</string>
+</dict>
+</plist>
