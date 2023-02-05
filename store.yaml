@@ -6,7 +6,7 @@ user
   active boolen
   notification string
 
-  + bluetooth
+  + wifi
       docID string
       name string
       alias | cstmName string
