@@ -1,0 +1,13 @@
+user
+  uID string
+  name string
+  divice string
+  provider string
+  active boolen
+  notification string
+
+  + bluetooth
+      docID string
+      name string
+      alias | cstmName string
+      cretedAt timestamp
