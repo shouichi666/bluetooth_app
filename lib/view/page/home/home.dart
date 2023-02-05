@@ -1,6 +1,10 @@
-import 'package:bluetooth_app_v1/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import 'package:habit/provider/auth_provider.dart';
+import 'package:habit/provider/local_notification_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -12,9 +16,11 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
+    ref.read(localNotificationControllerProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bluetooth App'),
+        title: const Text('Home'),
         actions: [
           IconButton(
             onPressed: ref.read(authControllerProvider.notifier).signOut,
@@ -22,25 +28,33 @@ class _HomePageState extends ConsumerState<HomePage> {
           )
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: ListView(
+        children: [
+          ListTile(
+            leading: const CircleAvatar(
+              child: Icon(Icons.airplanemode_active_sharp),
             ),
-            Text(
-              '_counter',
-              style: Theme.of(context).textTheme.headline4,
+            title: const Text('出勤アクション'),
+            onTap: () => context.goNamed(
+              'action',
+              params: {'id': 'case action'},
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
     );
   }
 }
+
+const sample = [
+  '1111111111111111111111111111111111',
+  '2222222222222222222222222222222222',
+  '3333333333333333333333333333333333',
+  '4444444444444444444444444444444444',
+  '5555555555555555555555555555555555',
+  '6666666666666666666666666666666666',
+];

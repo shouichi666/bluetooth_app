@@ -1,14 +1,15 @@
 import 'dart:async';
 
-import 'package:bluetooth_app_v1/utilry/log/log.dart';
+import 'package:habit/utilry/log/log.dart';
+import 'package:habit/view/page/action/action.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:bluetooth_app_v1/provider/auth_provider.dart';
-import 'package:bluetooth_app_v1/view/page/home/home.dart';
-import 'package:bluetooth_app_v1/view/page/launch/launch.dart';
+import 'package:habit/provider/auth_provider.dart';
+import 'package:habit/view/page/home/home.dart';
+import 'package:habit/view/page/launch/launch.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = AsyncRouterNotifier(ref);
@@ -66,16 +67,20 @@ class AsyncRouterNotifier extends ChangeNotifier {
         GoRoute(
           path: '/',
           builder: (context, _) => const HomePage(),
-          // routes: <RouteBase>[
-          //  GoRoute(
-          //    path: 'myaddress_edit/:address',
-          //    builder: (context, _) => Myaddress(
-          //      key: _.pageKey,
-          //      address: _.params['address']!,
-          //      name: _.queryParams['name']!,
-          //    ),
-          //  ),
-          // ],
+          routes: <RouteBase>[
+            GoRoute(
+              path: 'action/:id',
+              name: 'action',
+              pageBuilder: (context, state) {
+                return MaterialPage(
+                  child: ActionDetailPage(
+                    key: state.pageKey,
+                    id: state.params['id']!,
+                  ),
+                );
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: '/launch',

@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:bluetooth_app_v1/repository/auth_reposiotory.dart';
-import 'package:bluetooth_app_v1/utilry/log/log.dart';
+import 'package:habit/repository/auth_reposiotory.dart';
+import 'package:habit/utilry/log/log.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
 
