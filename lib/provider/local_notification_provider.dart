@@ -1,8 +1,7 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:habit/repository/local_notification_reposiotory.dart';
-import 'package:habit/utilry/log/log.dart';
 
 final localNotificationControllerProvider =
     StateNotifierProvider<LocalNotificationController, List<PendingNotificationRequest>>(
@@ -24,7 +23,7 @@ class LocalNotificationController
     _localNotification.init();
     state = await _localNotification.pending();
 
-    pd(state[state.length - 1].id);
+    // pd(state[state.length - 1].id);
   }
 
   set() {
