@@ -8,7 +8,7 @@ user
 
   + wifi
       docID string
-      name string
+      ssid string
       alias | cstmName string
       purpose string
       cretedAt timestamp
