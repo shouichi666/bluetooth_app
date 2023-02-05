@@ -10,4 +10,5 @@ user
       docID string
       name string
       alias | cstmName string
+      purpose string
       cretedAt timestamp
