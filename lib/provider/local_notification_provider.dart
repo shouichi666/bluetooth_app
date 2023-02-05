@@ -16,22 +16,22 @@ class LocalNotificationController
   }
 
   final Ref ref;
-  late LocalNotificationRepository _local;
+  late LocalNotificationRepository _localNotification;
 
   //設定されているアラームのいちらん
   _init() async {
-    _local = LocalNotificationRepository();
-    _local.init();
-    state = await _local.pending();
+    _localNotification = LocalNotificationRepository();
+    _localNotification.init();
+    state = await _localNotification.pending();
 
-    pd(state[0].id);
+    pd(state[state.length - 1].id);
   }
 
   set() {
-    _local.setNotification();
+    _localNotification.setNotification();
   }
 
   removeAll() {
-    _local.removeAll();
+    _localNotification.removeAll();
   }
 }
