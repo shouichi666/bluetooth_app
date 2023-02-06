@@ -1,0 +1,11 @@
+{
+    "dart.flutterSdkPath": ".fvm/flutter_sdk",
+    // 検索時にfvmを除外
+    "search.exclude": {
+      "**/.fvm": true
+    },
+    // ワークスペースの監視から除外
+    "files.watcherExclude": {
+      "**/.fvm": true
+    }
+  }
