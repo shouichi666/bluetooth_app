@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:habit/provider/local_notification_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ActionDetailPage extends ConsumerWidget {
   const ActionDetailPage({super.key, required this.id});
@@ -18,12 +17,6 @@ class ActionDetailPage extends ConsumerWidget {
       ),
       body: ListView(
         children: [
-          const ListTile(
-            leading: CircleAvatar(
-              child: Icon(Icons.wifi),
-            ),
-            title: Text('このWIFIに接続時に何をするのかアクション設定'),
-          ),
           ListTile(
             leading: const CircleAvatar(
               child: Icon(Icons.timer),

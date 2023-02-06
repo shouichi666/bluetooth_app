@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePageState extends ConsumerWidget {
-  const HomePageState({super.key});
+class SettingPage extends ConsumerWidget {
+  const SettingPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,7 +17,7 @@ class HomePageState extends ConsumerWidget {
           children: [
             Text(
               'counter',
-              style: Theme.of(context).textTheme.headline4,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
         ),

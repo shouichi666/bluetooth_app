@@ -43,18 +43,9 @@ class _HomePageState extends ConsumerState<HomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => context.goNamed('register'),
         child: const Icon(Icons.add),
       ),
     );
   }
 }
-
-const sample = [
-  '1111111111111111111111111111111111',
-  '2222222222222222222222222222222222',
-  '3333333333333333333333333333333333',
-  '4444444444444444444444444444444444',
-  '5555555555555555555555555555555555',
-  '6666666666666666666666666666666666',
-];

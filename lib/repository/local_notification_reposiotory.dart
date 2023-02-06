@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:habit/utilry/log/log.dart';
@@ -6,7 +7,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 // import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/subjects.dart';
 // import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
 
 class LocalNotificationRepository {
   LocalNotificationRepository();
@@ -75,11 +75,19 @@ class LocalNotificationRepository {
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
     );
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse: (NotificationResponse payload) async {
-      debugPrint('notification payload: $payload');
-      onNotifications.add(payload.payload);
-    });
+    await _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse payload) async {
+        final obj = {
+          'id': payload.id,
+          'actionId': payload.actionId,
+          'payload': payload.payload,
+          'notificationResponseType': payload.notificationResponseType.name,
+        };
+
+        onNotifications.add(jsonEncode(obj));
+      },
+    );
   }
 
   Future<List<PendingNotificationRequest>> pending() async {
@@ -107,11 +115,12 @@ class LocalNotificationRepository {
   Future<void> setNotification() async {
     await _flutterLocalNotificationsPlugin.periodicallyShow(
       0,
-      'repeating title',
-      'repeating body',
+      '出勤だよ',
+      '勤怠おす',
       RepeatInterval.everyMinute,
       _platformChannelSpecifics,
       androidAllowWhileIdle: true,
+      payload: '          HOOOOOOOOOOOOOOOOOOOO            ',
     );
   }
 

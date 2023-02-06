@@ -1,20 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:habit/repository/auth_reposiotory.dart';
+import 'package:habit/repository/store_reposiotory.dart';
 import 'package:habit/utilry/log/log.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) => AuthRepository(ref));
 
-final authControllerProvider = StateNotifierProvider<AuthController, User?>(
-  (ref) => AuthController(ref),
-);
+final authControllerProvider = StateNotifierProvider<AuthController, User?>((ref) {
+  return AuthController(ref);
+});
 
 class AuthController extends StateNotifier<User?> {
   AuthController(this._ref) : super(null) {
-    pd('debugText');
     _ref.read(firebaseAuthProvider).userChanges().listen(_init);
   }
 
@@ -23,13 +22,21 @@ class AuthController extends StateNotifier<User?> {
   @override
   User? get state => _ref.read(authRepositoryProvider).getCurrentUser();
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  _init(User? user) {
+  _init(User? user) async {
     state = user;
+
+    pd(user);
+
+    if (state != null) {
+      await StoreRepository(_ref, state!.uid).login(state!);
+    }
+
+    _ref.listenSelf((pre, next) async {
+      if (pre == null && next != null) {
+        pd(next);
+        await StoreRepository(_ref, (next as User).uid).login(next);
+      }
+    });
   }
 
   Future<void> signUp() async {

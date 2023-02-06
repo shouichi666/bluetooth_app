@@ -1,7 +1,7 @@
 // ignore_for_file: constant_identifier_names, camel_case_types, non_constant_identifier_names
-import 'package:flutter/cupertino.dart';
 
-import 'package:tks_cell/constant/size.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:habit/constant/size.dart';
 
 /// @BorderRadius ALl R2 - 8
 const RADIUS_ALL = BorderRadius.only(

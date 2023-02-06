@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:habit/utilry/log/log.dart';
 import 'package:habit/view/page/action/action.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:habit/provider/auth_provider.dart';
 import 'package:habit/view/page/home/home.dart';
 import 'package:habit/view/page/launch/launch.dart';
+import 'package:habit/view/page/register/register.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = AsyncRouterNotifier(ref);
@@ -37,7 +37,7 @@ class AsyncRouterNotifier extends ChangeNotifier {
   Future<String?> _redirect(BuildContext context, GoRouterState state) async {
     final loginState = _ref.read(authControllerProvider);
 
-    pd(loginState);
+    // pd(loginState);
 
     if (loginState == null) {
       if (state.location.contains('/launch')) {
@@ -68,6 +68,15 @@ class AsyncRouterNotifier extends ChangeNotifier {
           path: '/',
           builder: (context, _) => const HomePage(),
           routes: <RouteBase>[
+            GoRoute(
+              path: 'register',
+              name: 'register',
+              pageBuilder: (context, state) {
+                return MaterialPage(
+                  child: RegisterPage(key: state.pageKey),
+                );
+              },
+            ),
             GoRoute(
               path: 'action/:id',
               name: 'action',

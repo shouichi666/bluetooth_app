@@ -16,6 +16,10 @@ class LaunchPage extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            FilledButton(
+              onPressed: () {},
+              child: const Text('Enabled'),
+            ),
             ElevatedButton(
               onPressed: ref.read(authControllerProvider.notifier).signUp,
               child: const Text('Google Signin'),
