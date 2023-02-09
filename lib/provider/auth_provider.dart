@@ -4,6 +4,8 @@ import 'package:habit/repository/auth_reposiotory.dart';
 import 'package:habit/repository/store_reposiotory.dart';
 import 'package:habit/utilry/log/log.dart';
 
+import 'dart:async';
+
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) => AuthRepository(ref));
@@ -25,7 +27,7 @@ class AuthController extends StateNotifier<User?> {
   _init(User? user) async {
     state = user;
 
-    pd(user);
+    // pd(user);
 
     if (state != null) {
       await StoreRepository(_ref, state!.uid).login(state!);

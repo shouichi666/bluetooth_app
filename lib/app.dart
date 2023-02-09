@@ -18,7 +18,8 @@ class App extends ConsumerWidget {
       routerDelegate: router.routerDelegate,
       theme: ThemeData(
         useMaterial3: true,
-        primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+        primarySwatch: Colors.blueGrey,
       ),
     );
   }

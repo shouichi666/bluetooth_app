@@ -54,6 +54,9 @@ dependencies:
   cloud_firestore: ^4.3.1
   gap: ^2.0.1
   enum_to_string: ^2.0.1
+  flutter_beacon: ^0.5.1
+  shared_preferences: ^2.0.17
+  uuid: ^3.0.7
 
 dev_dependencies:
   flutter_test:

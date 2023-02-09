@@ -7,9 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:habit/provider/auth_provider.dart';
+import 'package:habit/view/page/broadcast/broadcast.dart';
 import 'package:habit/view/page/home/home.dart';
 import 'package:habit/view/page/launch/launch.dart';
 import 'package:habit/view/page/register/register.dart';
+import 'package:habit/view/page/setting/setting.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = AsyncRouterNotifier(ref);
@@ -69,11 +71,29 @@ class AsyncRouterNotifier extends ChangeNotifier {
           builder: (context, _) => const HomePage(),
           routes: <RouteBase>[
             GoRoute(
+              path: 'broadcasting',
+              name: 'broadcasting',
+              pageBuilder: (context, state) {
+                return MaterialPage(
+                  child: TabBroadcasting(key: state.pageKey),
+                );
+              },
+            ),
+            GoRoute(
               path: 'register',
               name: 'register',
               pageBuilder: (context, state) {
                 return MaterialPage(
                   child: RegisterPage(key: state.pageKey),
+                );
+              },
+            ),
+            GoRoute(
+              path: 'setting',
+              name: 'setting',
+              pageBuilder: (context, state) {
+                return MaterialPage(
+                  child: SettingPage(key: state.pageKey),
                 );
               },
             ),
