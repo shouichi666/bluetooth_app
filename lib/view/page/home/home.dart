@@ -60,14 +60,15 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   startScanBeacon() async {
-    // flutterBeacon.setBetweenScanPeriod(1000);
-    flutterBeacon.setScanPeriod(1000);
+    flutterBeacon.setBetweenScanPeriod(10000);
+    // flutterBeacon.setScanPeriod(1000);
 
     final regions = <Region>[
       Region(identifier: 'com.beacon'),
     ];
 
     _streamRanging = flutterBeacon.ranging(regions).listen((RangingResult result) async {
+      pd('---   ${DateTime.now()}   ---');
       if (mounted) {
         setState(() {
           _isPaused = _streamRanging?.isPaused ?? false;
@@ -318,13 +319,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: FloatingActionButton(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(90.0)),
           // elevation: isVisible ? 0.0 : null,
-          onPressed: () async {
-            if (!_isPaused) {
-              pauseScanBeacon();
-            } else {
-              startScanBeacon();
-            }
-          },
+          onPressed: () async => !_isPaused ? pauseScanBeacon() : startScanBeacon(),
           child: Icon(!_isPaused ? Icons.stop : Icons.power_settings_new),
         ),
       ),
