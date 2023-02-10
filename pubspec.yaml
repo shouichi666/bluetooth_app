@@ -57,6 +57,8 @@ dependencies:
   flutter_beacon: ^0.5.1
   shared_preferences: ^2.0.17
   uuid: ^3.0.7
+  sleek_circular_slider: ^2.0.1
+  syncfusion_flutter_sliders: ^20.4.49
 
 dev_dependencies:
   flutter_test:
