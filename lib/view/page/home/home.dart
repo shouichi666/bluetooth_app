@@ -1,10 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
+import 'package:habit/provider/beacon_provider.dart';
 import 'package:habit/provider/interval_provider.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
@@ -13,8 +12,6 @@ import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 import 'package:habit/constant/size.dart';
 import 'package:habit/constant/style.dart';
-import 'package:habit/utilry/log/log.dart';
-import 'package:habit/provider/local_notification_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -24,120 +21,32 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  StreamSubscription<RangingResult>? _streamRanging;
-
-  bool _isPaused = false;
-
-  final bool isElevated = false;
-  final bool isVisible = true;
-
-  final _beacons = <Beacon>[];
-
-  final _regionBeacons = <Region, List<Beacon>>{};
-
   // late SharedPreferences _prefs;
 
-  @override
-  void initState() {
-    init();
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    ref.read(localNotificationControllerProvider);
-
-    startScanBeacon();
-
-    super.didChangeDependencies();
-  }
-
-  init() async {
-    // _prefs = await SharedPreferences.getInstance();
-
-    await flutterBeacon.initializeScanning;
-  }
-
-  pauseScanBeacon() async {
-    _streamRanging?.pause();
-
-    setState(() => _isPaused = true);
-
-    if (_beacons.isNotEmpty) {
-      setState(() {
-        _beacons.clear();
-      });
-    }
-  }
-
-  startScanBeacon() async {
-    flutterBeacon.setBetweenScanPeriod(1000);
-
-    final regions = <Region>[
-      Region(identifier: 'com.beacon'),
-    ];
-
-    _streamRanging = flutterBeacon.ranging(regions).listen((RangingResult result) async {
-      if (mounted) {
-        setState(() {
-          pd(result.beacons.length);
-          // pd(result);
-
-          _isPaused = _streamRanging?.isPaused ?? false;
-
-          _regionBeacons[result.region] = result.beacons;
-          _beacons.clear();
-
-          for (var list in _regionBeacons.values) {
-            _beacons.addAll(list);
-          }
-          _beacons.sort(_compareParameters);
-        });
-
-        for (var b in _beacons) {
-          // pd(b.proximity);
-          if (b.proximity == Proximity.near) {
-            ref.read(localNotificationControllerProvider.notifier);
-          }
-        }
-      }
-    });
-  }
-
-  int _compareParameters(Beacon a, Beacon b) {
-    int compare = a.proximityUUID.compareTo(b.proximityUUID);
-
-    if (compare == 0) {
-      compare = a.major.compareTo(b.major);
-    }
-
-    if (compare == 0) {
-      compare = a.minor.compareTo(b.minor);
-    }
-
-    return compare;
-  }
-
-  @override
-  void dispose() {
-    _streamRanging?.cancel();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _streamRanging?.cancel();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final scanBeacon = ref.watch(beaconControllerProvider.select((e) => e.scanBeacon));
+
+    final baeconAction = ref.read(beaconControllerProvider.notifier);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('HoGEe'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {},
           ),
-          IconButton(
-            icon: const Icon(Icons.broadcast_on_personal_outlined),
-            onPressed: () => context.goNamed('broadcasting'),
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.broadcast_on_personal_outlined),
+          //   onPressed: () => context.goNamed('broadcasting'),
+          // ),
           // IconButton(
           //   icon: const Icon(Icons.settings),
           //   onPressed: () => context.goNamed('setting'),
@@ -145,8 +54,8 @@ class _HomePageState extends ConsumerState<HomePage> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              flutterBeacon.stopBroadcast();
-              _streamRanging?.cancel();
+              // flutterBeacon.stopBroadcast();
+              // _streamRanging?.cancel();
 
               flutterBeacon.close;
             },
@@ -155,7 +64,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
       body: Column(
         children: [
-          Flexible(
+          Expanded(
             flex: 1,
             child: Container(
               margin: const EdgeInsets.all(S2),
@@ -165,82 +74,83 @@ class _HomePageState extends ConsumerState<HomePage> {
                 borderRadius: RADIUS_ALL_M,
                 color: Colors.black,
               ),
-              child: _isPaused == false
-                  ? _beacons.isEmpty
+              child: ref.watch(beaconControllerProvider.select((e) => e.isScaning))
+                  ? scanBeacon.uuid.isEmpty
                       ? const Center(child: CircularProgressIndicator())
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      : Stack(
+                          fit: StackFit.passthrough,
+                          alignment: Alignment.center,
+                          // crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Text(
+                              scanBeacon.uuid,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  _beacons[0].proximityUUID,
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                ),
-                                GAP3,
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SleekCircularSlider(
-                                      appearance: CircularSliderAppearance(
-                                        customWidths: CustomSliderWidths(
-                                          trackWidth: 1,
-                                          progressBarWidth: 18,
-                                          shadowWidth: 60,
-                                        ),
-                                        startAngle: 180,
-                                        angleRange: 240,
-                                        infoProperties: InfoProperties(
-                                          topLabelText: _beacons[0].proximity.name,
-                                          topLabelStyle: const TextStyle(
-                                              fontSize: 12.0,
-                                              fontWeight: FontWeight.w100),
-                                          mainLabelStyle: const TextStyle(
-                                              // color: HexColor('#FF6BD9'),
-                                              fontSize: 20.0,
-                                              fontWeight: FontWeight.w100),
-                                          modifier: (double value) {
-                                            final volume = value.toInt();
-                                            return '- $volume dBm';
-                                          },
-                                          bottomLabelStyle: const TextStyle(
-                                              fontSize: 10, fontWeight: FontWeight.w200),
-                                          bottomLabelText: 'RSSI',
-                                        ),
-                                        size: 180.0,
-                                        counterClockwise: true,
-                                        animDurationMultiplier: .9,
-                                      ),
-                                      initialValue: _beacons[0].rssi.toDouble() < 0
-                                          ? _beacons[0].rssi.toDouble() * -1
-                                          : _beacons[0].rssi.toDouble() * 1,
+                                SleekCircularSlider(
+                                  appearance: CircularSliderAppearance(
+                                    customWidths: CustomSliderWidths(
+                                      trackWidth: 1,
+                                      progressBarWidth: 18,
+                                      shadowWidth: 60,
                                     ),
-                                  ],
+                                    startAngle: 180,
+                                    angleRange: 240,
+                                    infoProperties: InfoProperties(
+                                      topLabelText: scanBeacon.proximity,
+                                      topLabelStyle: const TextStyle(
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.w100,
+                                      ),
+                                      mainLabelStyle: const TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.w100,
+                                      ),
+                                      modifier: (double value) {
+                                        final volume = value.toInt();
+                                        return '- $volume dBm';
+                                      },
+                                      bottomLabelStyle: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w200,
+                                      ),
+                                      bottomLabelText: 'RSSI',
+                                    ),
+                                    size: 180.0,
+                                    counterClockwise: true,
+                                    animDurationMultiplier: .9,
+                                  ),
+                                  initialValue: scanBeacon.rssi.toDouble() < 0
+                                      ? scanBeacon.rssi.toDouble() * -1
+                                      : scanBeacon.rssi.toDouble() * 1,
                                 ),
                               ],
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Major: ${_beacons[0].major}',
-                                  style: Theme.of(context).textTheme.labelLarge,
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: S1),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Major : ${scanBeacon.major}',
+                                      style: Theme.of(context).textTheme.labelLarge,
+                                    ),
+                                    Text(
+                                      'Minor : ${scanBeacon.minor}',
+                                      style: Theme.of(context).textTheme.labelLarge,
+                                    ),
+                                    Text(
+                                      'Accuracy : ${scanBeacon.accuracy}m',
+                                      style: Theme.of(context).textTheme.labelLarge,
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  'Minor: ${_beacons[0].minor}',
-                                  style: Theme.of(context).textTheme.labelLarge,
-                                ),
-                                Text(
-                                  'Accuracy: ${_beacons[0].accuracy}m',
-                                  style: Theme.of(context).textTheme.labelLarge,
-                                ),
-                                Text(
-                                  'Proximity: ${_beacons[0].proximity.name}',
-                                  style: Theme.of(context).textTheme.labelLarge,
-                                ),
-                              ],
+                              ),
                             ),
                           ],
                         )
@@ -249,7 +159,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
             ),
           ),
-          Flexible(
+          Expanded(
             flex: 1,
             child: Column(
               children: [
@@ -259,7 +169,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       child: Card(
                         clipBehavior: Clip.hardEdge,
                         child: InkWell(
-                          onTap: () {},
+                          onTap: baeconAction.handleScan,
                           child: Container(
                             padding: const EdgeInsets.fromLTRB(S3, S0, S1, S1),
                             child: Column(
@@ -298,12 +208,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                        ref.watch(intervalControllerProvider
-                                            .select((e) => e.label)),
-                                        style: Theme.of(context).textTheme.titleLarge),
+                                      ref.watch(intervalControllerProvider
+                                          .select((e) => e.label)),
+                                      style: Theme.of(context).textTheme.titleLarge,
+                                    ),
                                     Switch(
-                                      value: true,
-                                      onChanged: (e) {},
+                                      value: ref.watch(beaconControllerProvider
+                                          .select((e) => e.isScaning)),
+                                      onChanged: baeconAction.toggleSwitchScan,
                                     ),
                                   ],
                                 ),
@@ -359,14 +271,78 @@ class _HomePageState extends ConsumerState<HomePage> {
                   children: [
                     Expanded(
                       child: Card(
+                        clipBehavior: Clip.hardEdge,
+                        child: InkWell(
+                          // onTap: baeconAction.toggleScan,
+                          child: Container(
+                            padding: const EdgeInsets.fromLTRB(S3, S0, S1, S1),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Broadcast',
+                                      style: Theme.of(context).textTheme.titleSmall,
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        showModalBottomSheet(
+                                          context: context,
+                                          // isScrollControlled: true,
+                                          clipBehavior: Clip.antiAlias,
+                                          shape: SHERPE_TOP,
+                                          // constraints: BoxConstraints(
+                                          //   maxHeight:
+                                          //       MediaQuery.of(context).size.height * 0.5,
+                                          // ),
+                                          builder: ((context) {
+                                            return const SelectBroadCast();
+                                          }),
+                                        );
+                                      },
+                                      icon: const Icon(Icons.more_horiz),
+                                    )
+                                  ],
+                                ),
+                                GAP2,
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      ref.watch(beaconControllerProvider
+                                              .select((e) => e.isBroadcasting))
+                                          ? 'active'
+                                          : 'inactive',
+                                      style: Theme.of(context).textTheme.titleLarge,
+                                    ),
+                                    Switch(
+                                      value: ref.watch(beaconControllerProvider
+                                          .select((e) => e.isBroadcasting)),
+                                      onChanged: (e) async => ref
+                                          .read(beaconControllerProvider.notifier)
+                                          .handleToggleBroadcast(context),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Card(
                         child: Container(
-                          padding: const EdgeInsets.fromLTRB(S3, S6, S1, S6),
+                          padding: const EdgeInsets.fromLTRB(S3, S5, S1, S5),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Action',
+                                'Task',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ],
@@ -388,15 +364,19 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: FloatingActionButton(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(90.0)),
           // elevation: isVisible ? 0.0 : null,
-          onPressed: () async => !_isPaused ? pauseScanBeacon() : startScanBeacon(),
-          child: Icon(!_isPaused ? Icons.stop : Icons.power_settings_new),
+          onPressed: baeconAction.handleScan,
+          child: Icon(
+            ref.watch(beaconControllerProvider.select((e) => e.isScaning))
+                ? Icons.stop
+                : Icons.power_settings_new,
+          ),
         ),
       ),
       bottomNavigationBar: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        height: isVisible ? 80.0 : 0,
+        // height: isVisible ? 80.0 : 0,
         child: BottomAppBar(
-          elevation: isElevated ? null : 0.0,
+          // elevation: isElevated ? null : 0.0,
           child: Row(
             children: [
               IconButton(
@@ -511,6 +491,46 @@ class SelectTime extends ConsumerWidget {
             ],
           )),
     );
+  }
+}
+
+class SelectBroadCast extends ConsumerWidget {
+  const SelectBroadCast({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Broadcast contoller'),
+          automaticallyImplyLeading: false,
+        ),
+        body: ListView(
+          children: [
+            ListTile(
+              onTap: () async => ref
+                  .read(beaconControllerProvider.notifier)
+                  .handleToggleBroadcast(context),
+              leading: const Icon(Icons.wifi_tethering),
+              title: const Text('Broadcast on/off'),
+              trailing: Switch(
+                value:
+                    ref.watch(beaconControllerProvider.select((e) => e.isBroadcasting)),
+                onChanged: (e) async => ref
+                    .read(beaconControllerProvider.notifier)
+                    .handleToggleBroadcast(context),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Register/Setup'),
+              onTap: () => context.goNamed('broadcasting'),
+            ),
+            const ListTile(
+              leading: Icon(Icons.qr_code_2_outlined),
+              title: Text('QRcode UUID'),
+            ),
+          ],
+        ));
   }
 }
 

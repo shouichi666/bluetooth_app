@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:habit/model/beacon/beacon.dart';
 import 'package:habit/provider/user_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -7,6 +9,9 @@ class StoreRepository {
 
   final Ref _ref;
   final String _uid;
+
+  DocumentReference<Map<String, dynamic>> get _udoc =>
+      _ref.read(storeProvider).collection('user').doc(_uid);
 
   login(User user) async {
     if (_uid.isEmpty) return;
@@ -38,5 +43,63 @@ class StoreRepository {
         },
       );
     }
+  }
+
+  Future<BroadcastBeacon> relativeBroadcast() async {
+    final broadcast =
+        await _udoc.collection('broadcast').doc(_uid).get().then((e) => e.data());
+
+    return BroadcastBeacon.fromJson(broadcast!);
+  }
+
+  Future<dynamic> relativeState() async {
+    final state = await _udoc.collection('state').doc(_uid).get().then((e) => e.data());
+
+    if (state == null) {
+      final newState = {
+        'isBroadcasting': false,
+        'isScaning': false,
+      };
+      await _udoc.collection('state').doc(_uid).set(newState);
+      return newState;
+    }
+
+    return state;
+  }
+
+  postBroadcast(BroadcastBeacon model) async {
+    await _ref
+        .read(storeProvider)
+        .collection('user')
+        .doc(_uid)
+        .collection('broadcast')
+        .doc(_uid)
+        .set(model.toJson());
+  }
+
+  postState(BeaconState model) async {
+    await _ref
+        .read(storeProvider)
+        .collection('user')
+        .doc(_uid)
+        .collection('state')
+        .doc(_uid)
+        .set(
+      {
+        'isBroadcasting': model.isBroadcasting,
+        'isScaning': model.isScaning,
+        'isSomePermission': model.isSomePermission,
+      },
+    );
+  }
+
+  deleteBroadcast(String id) async {
+    await _ref
+        .read(storeProvider)
+        .collection('user')
+        .doc(_uid)
+        .collection('broadcast')
+        .doc(id)
+        .delete();
   }
 }

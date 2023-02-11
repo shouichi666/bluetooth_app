@@ -18,7 +18,7 @@ class IntervalController extends StateNotifier<IntervalState> {
     _ref;
 
     state = state.copyWith(
-      label: 'Unknown',
+      label: 'unknown',
     );
   }
 

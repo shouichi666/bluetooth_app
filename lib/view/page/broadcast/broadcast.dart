@@ -1,40 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit/provider/beacon_provider.dart';
+import 'package:habit/provider/common_provider.dart';
 
-import 'package:uuid/uuid.dart';
-import 'package:flutter_beacon/flutter_beacon.dart';
-
-class TabBroadcasting extends StatefulWidget {
+class TabBroadcasting extends ConsumerStatefulWidget {
   const TabBroadcasting({super.key});
-
   @override
-  // ignore: library_private_types_in_public_api
-  _TabBroadcastingState createState() => _TabBroadcastingState();
+  ConsumerState<TabBroadcasting> createState() => _TabBroadcastingState();
 }
 
-class _TabBroadcastingState extends State<TabBroadcasting> {
+class _TabBroadcastingState extends ConsumerState<TabBroadcasting> {
   final clearFocus = FocusNode();
-  bool broadcasting = false;
-
-  final regexUUID = RegExp(
-      r'[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}');
-  final uuidController = TextEditingController(text: '');
-  final majorController = TextEditingController(text: '0');
-  final minorController = TextEditingController(text: '0');
-
-  var uuid = const Uuid();
-
-  @override
-  void initState() {
-    initBroadcastBeacon();
-
-    uuidController.text = uuid.v4();
-
-    super.initState();
-  }
-
-  initBroadcastBeacon() async {
-    await flutterBeacon.initializeScanning;
-  }
 
   @override
   void dispose() {
@@ -46,7 +22,7 @@ class _TabBroadcastingState extends State<TabBroadcasting> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Broadcast'),
+        title: const Text('Register/Setup'),
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(clearFocus),
@@ -69,40 +45,26 @@ class _TabBroadcastingState extends State<TabBroadcasting> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          if (broadcasting) {
-            await flutterBeacon.stopBroadcast();
-          } else {
-            await flutterBeacon.startBroadcast(
-              BeaconBroadcast(
-                // identifier: 'com.CB10023F-A318-3394-4199-A8730C7C1AEC',
-                proximityUUID: uuidController.text,
-                major: int.tryParse(majorController.text) ?? 0,
-                minor: int.tryParse(minorController.text) ?? 0,
-              ),
-            );
-          }
-
-          final isBroadcasting = await flutterBeacon.isBroadcasting();
-
-          if (mounted) {
-            setState(() {
-              broadcasting = isBroadcasting;
-            });
-          }
-        },
+        onPressed: () async => await ref
+            .read(beaconControllerProvider.notifier)
+            .hendleBroadcastCommit(context),
         icon: Icon(
-          broadcasting ? Icons.stop_circle_rounded : Icons.broadcast_on_personal,
+          ref.watch(beaconControllerProvider.select((e) => e.isBroadcasting))
+              ? Icons.stop_circle_rounded
+              : Icons.broadcast_on_personal,
         ),
-        label: Text(broadcasting ? 'Stop' : 'Broadcast'),
+        label: Text(ref.watch(beaconControllerProvider.select((e) => e.isBroadcasting))
+            ? 'Stop'
+            : 'Broadcast'),
       ),
     );
   }
 
   Widget get uuidField {
     return TextFormField(
-      readOnly: broadcasting,
-      controller: uuidController,
+      autofocus: true,
+      readOnly: ref.watch(beaconControllerProvider.select((e) => e.isBroadcasting)),
+      controller: ref.watch(uuidTextProvider),
       decoration: const InputDecoration(
         labelText: 'Proximity UUID',
       ),
@@ -110,6 +72,9 @@ class _TabBroadcastingState extends State<TabBroadcasting> {
         if (val == null || val.isEmpty) {
           return 'Proximity UUID required';
         }
+
+        final regexUUID = RegExp(
+            r'[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}');
 
         if (!regexUUID.hasMatch(val)) {
           return 'Invalid Proxmity UUID format';
@@ -122,8 +87,8 @@ class _TabBroadcastingState extends State<TabBroadcasting> {
 
   Widget get majorField {
     return TextFormField(
-      readOnly: broadcasting,
-      controller: majorController,
+      readOnly: ref.watch(beaconControllerProvider.select((e) => e.isBroadcasting)),
+      controller: ref.watch(majorTextProvider),
       decoration: const InputDecoration(
         labelText: 'Major',
       ),
@@ -150,8 +115,8 @@ class _TabBroadcastingState extends State<TabBroadcasting> {
 
   Widget get minorField {
     return TextFormField(
-      readOnly: broadcasting,
-      controller: minorController,
+      readOnly: ref.watch(beaconControllerProvider.select((e) => e.isBroadcasting)),
+      controller: ref.watch(minorTextProvider),
       decoration: const InputDecoration(
         labelText: 'Minor',
       ),
