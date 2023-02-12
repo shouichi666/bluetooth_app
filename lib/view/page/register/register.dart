@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:habit/constant/size.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
@@ -30,6 +31,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Add action'),
+          actions: [
+            IconButton(
+              onPressed: () => context.goNamed('qr_scan'),
+              icon: const Icon(Icons.qr_code_scanner),
+            )
+          ],
         ),
         body: SingleChildScrollView(
           reverse: true,

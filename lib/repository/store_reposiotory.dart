@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:habit/model/beacon/beacon.dart';
 import 'package:habit/provider/user_provider.dart';
+import 'package:habit/utilry/log/log.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class StoreRepository {
@@ -45,6 +46,12 @@ class StoreRepository {
     }
   }
 
+  Future<ScanBeacon> relativeScan() async {
+    final scan = await _udoc.collection('scan').doc(_uid).get().then((e) => e.data());
+
+    return ScanBeacon.fromJson(scan!);
+  }
+
   Future<BroadcastBeacon> relativeBroadcast() async {
     final broadcast =
         await _udoc.collection('broadcast').doc(_uid).get().then((e) => e.data());
@@ -67,24 +74,18 @@ class StoreRepository {
     return state;
   }
 
+  postScanBeacon(ScanBeacon beacon) async {
+    await _udoc.collection('scan').doc(_uid).set(beacon.toJson());
+  }
+
   postBroadcast(BroadcastBeacon model) async {
-    await _ref
-        .read(storeProvider)
-        .collection('user')
-        .doc(_uid)
-        .collection('broadcast')
-        .doc(_uid)
-        .set(model.toJson());
+    await _udoc.collection('broadcast').doc(_uid).set(model.toJson());
   }
 
   postState(BeaconState model) async {
-    await _ref
-        .read(storeProvider)
-        .collection('user')
-        .doc(_uid)
-        .collection('state')
-        .doc(_uid)
-        .set(
+    pd(model);
+
+    await _udoc.collection('state').doc(_uid).set(
       {
         'isBroadcasting': model.isBroadcasting,
         'isScaning': model.isScaning,
@@ -94,12 +95,6 @@ class StoreRepository {
   }
 
   deleteBroadcast(String id) async {
-    await _ref
-        .read(storeProvider)
-        .collection('user')
-        .doc(_uid)
-        .collection('broadcast')
-        .doc(id)
-        .delete();
+    await _udoc.collection('broadcast').doc(id).delete();
   }
 }

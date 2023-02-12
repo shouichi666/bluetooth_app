@@ -10,7 +10,6 @@ part of 'beacon.dart';
 
 _$_BeaconState _$$_BeaconStateFromJson(Map<String, dynamic> json) =>
     _$_BeaconState(
-      uuid: json['uuid'] as String? ?? '',
       scanBeacon: json['scanBeacon'] == null
           ? const ScanBeacon()
           : ScanBeacon.fromJson(json['scanBeacon'] as Map<String, dynamic>),
@@ -18,6 +17,10 @@ _$_BeaconState _$$_BeaconStateFromJson(Map<String, dynamic> json) =>
           ? const BroadcastBeacon()
           : BroadcastBeacon.fromJson(
               json['broadcasBeacon'] as Map<String, dynamic>),
+      scanList: (json['scanList'] as List<dynamic>?)
+              ?.map((e) => ScanBeacon.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       isScaning: json['isScaning'] as bool? ?? false,
       isBroadcasting: json['isBroadcasting'] as bool? ?? true,
       isSomePermission: json['isSomePermission'] as bool? ?? true,
@@ -25,9 +28,9 @@ _$_BeaconState _$$_BeaconStateFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$_BeaconStateToJson(_$_BeaconState instance) =>
     <String, dynamic>{
-      'uuid': instance.uuid,
       'scanBeacon': instance.scanBeacon,
       'broadcasBeacon': instance.broadcasBeacon,
+      'scanList': instance.scanList,
       'isScaning': instance.isScaning,
       'isBroadcasting': instance.isBroadcasting,
       'isSomePermission': instance.isSomePermission,

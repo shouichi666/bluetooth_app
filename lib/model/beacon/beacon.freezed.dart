@@ -20,9 +20,9 @@ BeaconState _$BeaconStateFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BeaconState {
-  String get uuid => throw _privateConstructorUsedError;
   ScanBeacon get scanBeacon => throw _privateConstructorUsedError;
   BroadcastBeacon get broadcasBeacon => throw _privateConstructorUsedError;
+  List<ScanBeacon> get scanList => throw _privateConstructorUsedError;
   bool get isScaning => throw _privateConstructorUsedError;
   bool get isBroadcasting => throw _privateConstructorUsedError;
   bool get isSomePermission => throw _privateConstructorUsedError;
@@ -40,9 +40,9 @@ abstract class $BeaconStateCopyWith<$Res> {
       _$BeaconStateCopyWithImpl<$Res, BeaconState>;
   @useResult
   $Res call(
-      {String uuid,
-      ScanBeacon scanBeacon,
+      {ScanBeacon scanBeacon,
       BroadcastBeacon broadcasBeacon,
+      List<ScanBeacon> scanList,
       bool isScaning,
       bool isBroadcasting,
       bool isSomePermission});
@@ -64,18 +64,14 @@ class _$BeaconStateCopyWithImpl<$Res, $Val extends BeaconState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? uuid = null,
     Object? scanBeacon = null,
     Object? broadcasBeacon = null,
+    Object? scanList = null,
     Object? isScaning = null,
     Object? isBroadcasting = null,
     Object? isSomePermission = null,
   }) {
     return _then(_value.copyWith(
-      uuid: null == uuid
-          ? _value.uuid
-          : uuid // ignore: cast_nullable_to_non_nullable
-              as String,
       scanBeacon: null == scanBeacon
           ? _value.scanBeacon
           : scanBeacon // ignore: cast_nullable_to_non_nullable
@@ -84,6 +80,10 @@ class _$BeaconStateCopyWithImpl<$Res, $Val extends BeaconState>
           ? _value.broadcasBeacon
           : broadcasBeacon // ignore: cast_nullable_to_non_nullable
               as BroadcastBeacon,
+      scanList: null == scanList
+          ? _value.scanList
+          : scanList // ignore: cast_nullable_to_non_nullable
+              as List<ScanBeacon>,
       isScaning: null == isScaning
           ? _value.isScaning
           : isScaning // ignore: cast_nullable_to_non_nullable
@@ -125,9 +125,9 @@ abstract class _$$_BeaconStateCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String uuid,
-      ScanBeacon scanBeacon,
+      {ScanBeacon scanBeacon,
       BroadcastBeacon broadcasBeacon,
+      List<ScanBeacon> scanList,
       bool isScaning,
       bool isBroadcasting,
       bool isSomePermission});
@@ -149,18 +149,14 @@ class __$$_BeaconStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? uuid = null,
     Object? scanBeacon = null,
     Object? broadcasBeacon = null,
+    Object? scanList = null,
     Object? isScaning = null,
     Object? isBroadcasting = null,
     Object? isSomePermission = null,
   }) {
     return _then(_$_BeaconState(
-      uuid: null == uuid
-          ? _value.uuid
-          : uuid // ignore: cast_nullable_to_non_nullable
-              as String,
       scanBeacon: null == scanBeacon
           ? _value.scanBeacon
           : scanBeacon // ignore: cast_nullable_to_non_nullable
@@ -169,6 +165,10 @@ class __$$_BeaconStateCopyWithImpl<$Res>
           ? _value.broadcasBeacon
           : broadcasBeacon // ignore: cast_nullable_to_non_nullable
               as BroadcastBeacon,
+      scanList: null == scanList
+          ? _value._scanList
+          : scanList // ignore: cast_nullable_to_non_nullable
+              as List<ScanBeacon>,
       isScaning: null == isScaning
           ? _value.isScaning
           : isScaning // ignore: cast_nullable_to_non_nullable
@@ -189,25 +189,32 @@ class __$$_BeaconStateCopyWithImpl<$Res>
 @JsonSerializable()
 class _$_BeaconState with DiagnosticableTreeMixin implements _BeaconState {
   const _$_BeaconState(
-      {this.uuid = '',
-      this.scanBeacon = const ScanBeacon(),
+      {this.scanBeacon = const ScanBeacon(),
       this.broadcasBeacon = const BroadcastBeacon(),
+      final List<ScanBeacon> scanList = const [],
       this.isScaning = false,
       this.isBroadcasting = true,
-      this.isSomePermission = true});
+      this.isSomePermission = true})
+      : _scanList = scanList;
 
   factory _$_BeaconState.fromJson(Map<String, dynamic> json) =>
       _$$_BeaconStateFromJson(json);
 
   @override
   @JsonKey()
-  final String uuid;
-  @override
-  @JsonKey()
   final ScanBeacon scanBeacon;
   @override
   @JsonKey()
   final BroadcastBeacon broadcasBeacon;
+  final List<ScanBeacon> _scanList;
+  @override
+  @JsonKey()
+  List<ScanBeacon> get scanList {
+    if (_scanList is EqualUnmodifiableListView) return _scanList;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_scanList);
+  }
+
   @override
   @JsonKey()
   final bool isScaning;
@@ -220,7 +227,7 @@ class _$_BeaconState with DiagnosticableTreeMixin implements _BeaconState {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'BeaconState(uuid: $uuid, scanBeacon: $scanBeacon, broadcasBeacon: $broadcasBeacon, isScaning: $isScaning, isBroadcasting: $isBroadcasting, isSomePermission: $isSomePermission)';
+    return 'BeaconState(scanBeacon: $scanBeacon, broadcasBeacon: $broadcasBeacon, scanList: $scanList, isScaning: $isScaning, isBroadcasting: $isBroadcasting, isSomePermission: $isSomePermission)';
   }
 
   @override
@@ -228,9 +235,9 @@ class _$_BeaconState with DiagnosticableTreeMixin implements _BeaconState {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'BeaconState'))
-      ..add(DiagnosticsProperty('uuid', uuid))
       ..add(DiagnosticsProperty('scanBeacon', scanBeacon))
       ..add(DiagnosticsProperty('broadcasBeacon', broadcasBeacon))
+      ..add(DiagnosticsProperty('scanList', scanList))
       ..add(DiagnosticsProperty('isScaning', isScaning))
       ..add(DiagnosticsProperty('isBroadcasting', isBroadcasting))
       ..add(DiagnosticsProperty('isSomePermission', isSomePermission));
@@ -241,11 +248,11 @@ class _$_BeaconState with DiagnosticableTreeMixin implements _BeaconState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_BeaconState &&
-            (identical(other.uuid, uuid) || other.uuid == uuid) &&
             (identical(other.scanBeacon, scanBeacon) ||
                 other.scanBeacon == scanBeacon) &&
             (identical(other.broadcasBeacon, broadcasBeacon) ||
                 other.broadcasBeacon == broadcasBeacon) &&
+            const DeepCollectionEquality().equals(other._scanList, _scanList) &&
             (identical(other.isScaning, isScaning) ||
                 other.isScaning == isScaning) &&
             (identical(other.isBroadcasting, isBroadcasting) ||
@@ -256,8 +263,14 @@ class _$_BeaconState with DiagnosticableTreeMixin implements _BeaconState {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, uuid, scanBeacon, broadcasBeacon,
-      isScaning, isBroadcasting, isSomePermission);
+  int get hashCode => Object.hash(
+      runtimeType,
+      scanBeacon,
+      broadcasBeacon,
+      const DeepCollectionEquality().hash(_scanList),
+      isScaning,
+      isBroadcasting,
+      isSomePermission);
 
   @JsonKey(ignore: true)
   @override
@@ -275,9 +288,9 @@ class _$_BeaconState with DiagnosticableTreeMixin implements _BeaconState {
 
 abstract class _BeaconState implements BeaconState {
   const factory _BeaconState(
-      {final String uuid,
-      final ScanBeacon scanBeacon,
+      {final ScanBeacon scanBeacon,
       final BroadcastBeacon broadcasBeacon,
+      final List<ScanBeacon> scanList,
       final bool isScaning,
       final bool isBroadcasting,
       final bool isSomePermission}) = _$_BeaconState;
@@ -286,11 +299,11 @@ abstract class _BeaconState implements BeaconState {
       _$_BeaconState.fromJson;
 
   @override
-  String get uuid;
-  @override
   ScanBeacon get scanBeacon;
   @override
   BroadcastBeacon get broadcasBeacon;
+  @override
+  List<ScanBeacon> get scanList;
   @override
   bool get isScaning;
   @override

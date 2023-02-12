@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:habit/provider/beacon_provider.dart';
 import 'package:habit/provider/interval_provider.dart';
+import 'package:habit/view/component/card.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
@@ -41,16 +42,17 @@ class _HomePageState extends ConsumerState<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {},
+            onPressed: () => context.goNamed('register'),
+            // onPressed: () => context.goNamed('qr_scan'),
           ),
           // IconButton(
           //   icon: const Icon(Icons.broadcast_on_personal_outlined),
           //   onPressed: () => context.goNamed('broadcasting'),
           // ),
-          // IconButton(
-          //   icon: const Icon(Icons.settings),
-          //   onPressed: () => context.goNamed('setting'),
-          // ),
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => context.goNamed('scan_list'),
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -161,198 +163,88 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           Expanded(
             flex: 1,
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Card(
-                        clipBehavior: Clip.hardEdge,
-                        child: InkWell(
-                          onTap: baeconAction.handleScan,
-                          child: Container(
-                            padding: const EdgeInsets.fromLTRB(S3, S0, S1, S1),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Scan',
-                                      style: Theme.of(context).textTheme.titleSmall,
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        showModalBottomSheet(
-                                          context: context,
-                                          isScrollControlled: true,
-                                          clipBehavior: Clip.antiAlias,
-                                          shape: SHERPE_TOP,
-                                          constraints: BoxConstraints(
-                                            maxHeight:
-                                                MediaQuery.of(context).size.height * 0.5,
-                                          ),
-                                          builder: ((context) {
-                                            return const SelectTime();
-                                          }),
-                                        );
-                                      },
-                                      icon: const Icon(Icons.more_horiz),
-                                    )
-                                  ],
-                                ),
-                                GAP2,
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      ref.watch(intervalControllerProvider
-                                          .select((e) => e.label)),
-                                      style: Theme.of(context).textTheme.titleLarge,
-                                    ),
-                                    Switch(
-                                      value: ref.watch(beaconControllerProvider
-                                          .select((e) => e.isScaning)),
-                                      onChanged: baeconAction.toggleSwitchScan,
-                                    ),
-                                  ],
-                                ),
-                              ],
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      ActionCard(
+                        icon: const Icon(Icons.sensors),
+                        label: 'Scan',
+                        content: '',
+                        // content:
+                        //     ref.watch(intervalControllerProvider.select((e) => e.label)),
+                        value: ref
+                            .watch(beaconControllerProvider.select((e) => e.isScaning)),
+                        onTap: baeconAction.handleScanBeacon,
+                        onChanged: (e) => baeconAction.toggleSwitchScan(e),
+                        moreAction: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            clipBehavior: Clip.antiAlias,
+                            shape: SHERPE_TOP,
+                            constraints: BoxConstraints(
+                              maxHeight: MediaQuery.of(context).size.height * 0.5,
                             ),
-                          ),
-                        ),
+                            builder: ((context) {
+                              return const SelectTime();
+                            }),
+                          );
+                        },
                       ),
-                    ),
-                    Expanded(
-                      child: Card(
-                        clipBehavior: Clip.hardEdge,
-                        child: InkWell(
-                          onTap: () {},
-                          child: Container(
-                            padding: const EdgeInsets.fromLTRB(S3, S0, S1, S1),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Notification',
-                                      style: Theme.of(context).textTheme.titleMedium,
-                                    ),
-                                    IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.more_horiz),
-                                    )
-                                  ],
-                                ),
-                                GAP2,
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Switch(
-                                      value: true,
-                                      onChanged: (e) {},
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                      ActionCard(
+                        icon: const Icon(Icons.broadcast_on_personal),
+                        label: 'Broadcast',
+                        content: ref.watch(
+                                beaconControllerProvider.select((e) => e.isBroadcasting))
+                            ? ''
+                            : '',
+                        value: ref.watch(
+                            beaconControllerProvider.select((e) => e.isBroadcasting)),
+                        onChanged: (e) async => ref
+                            .read(beaconControllerProvider.notifier)
+                            .handleToggleBroadcast(context),
+                        onTap: () async => ref
+                            .read(beaconControllerProvider.notifier)
+                            .handleToggleBroadcast(context),
+                        moreAction: () {
+                          showModalBottomSheet(
+                            context: context,
+                            clipBehavior: Clip.antiAlias,
+                            shape: SHERPE_TOP,
+                            builder: ((context) {
+                              return const SelectBroadCast();
+                            }),
+                          );
+                        },
                       ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Card(
-                        clipBehavior: Clip.hardEdge,
-                        child: InkWell(
-                          // onTap: baeconAction.toggleScan,
-                          child: Container(
-                            padding: const EdgeInsets.fromLTRB(S3, S0, S1, S1),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Broadcast',
-                                      style: Theme.of(context).textTheme.titleSmall,
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        showModalBottomSheet(
-                                          context: context,
-                                          // isScrollControlled: true,
-                                          clipBehavior: Clip.antiAlias,
-                                          shape: SHERPE_TOP,
-                                          // constraints: BoxConstraints(
-                                          //   maxHeight:
-                                          //       MediaQuery.of(context).size.height * 0.5,
-                                          // ),
-                                          builder: ((context) {
-                                            return const SelectBroadCast();
-                                          }),
-                                        );
-                                      },
-                                      icon: const Icon(Icons.more_horiz),
-                                    )
-                                  ],
-                                ),
-                                GAP2,
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      ref.watch(beaconControllerProvider
-                                              .select((e) => e.isBroadcasting))
-                                          ? 'active'
-                                          : 'inactive',
-                                      style: Theme.of(context).textTheme.titleLarge,
-                                    ),
-                                    Switch(
-                                      value: ref.watch(beaconControllerProvider
-                                          .select((e) => e.isBroadcasting)),
-                                      onChanged: (e) async => ref
-                                          .read(beaconControllerProvider.notifier)
-                                          .handleToggleBroadcast(context),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      ActionCard(
+                        icon: const Icon(Icons.notifications),
+                        label: 'Notification',
+                        content: '',
+                        onTap: baeconAction.handleScanBeacon,
+                        value: true,
+                        onChanged: (e) {},
+                        moreAction: () {},
                       ),
-                    ),
-                    Expanded(
-                      child: Card(
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(S3, S5, S1, S5),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Task',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            ],
-                          ),
-                        ),
+                      ActionCard(
+                        icon: const Icon(Icons.task_alt_rounded),
+                        label: 'Task',
+                        content: '',
+                        value: false,
+                        onChanged: (e) {},
+                        onTap: null,
+                        moreAction: () {},
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -364,7 +256,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: FloatingActionButton(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(90.0)),
           // elevation: isVisible ? 0.0 : null,
-          onPressed: baeconAction.handleScan,
+          onPressed: baeconAction.handleScanBeacon,
           child: Icon(
             ref.watch(beaconControllerProvider.select((e) => e.isScaning))
                 ? Icons.stop
@@ -502,34 +394,63 @@ class SelectBroadCast extends ConsumerWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Broadcast contoller'),
-          automaticallyImplyLeading: false,
-        ),
-        body: ListView(
-          children: [
-            ListTile(
-              onTap: () async => ref
+          actions: [
+            Switch(
+              value: ref.watch(beaconControllerProvider.select((e) => e.isBroadcasting)),
+              onChanged: (e) async => ref
                   .read(beaconControllerProvider.notifier)
                   .handleToggleBroadcast(context),
-              leading: const Icon(Icons.wifi_tethering),
-              title: const Text('Broadcast on/off'),
-              trailing: Switch(
-                value:
-                    ref.watch(beaconControllerProvider.select((e) => e.isBroadcasting)),
-                onChanged: (e) async => ref
-                    .read(beaconControllerProvider.notifier)
-                    .handleToggleBroadcast(context),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Register/Setup'),
-              onTap: () => context.goNamed('broadcasting'),
-            ),
-            const ListTile(
-              leading: Icon(Icons.qr_code_2_outlined),
-              title: Text('QRcode UUID'),
             ),
           ],
+          automaticallyImplyLeading: false,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Flexible(
+                flex: 3,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (ref.watch(
+                          beaconControllerProvider.select((e) => e.isBroadcasting)))
+                        const Icon(Icons.wifi_tethering, size: 80)
+                      else
+                        const Icon(Icons.wifi_tethering_off, size: 80),
+                      GAP3,
+                      Text(
+                        ref.watch(beaconControllerProvider
+                            .select((e) => e.broadcasBeacon.uuid)),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ListTile(
+                        leading: const Icon(Icons.settings),
+                        title: const Text('Register/Setup'),
+                        onTap: () => context.goNamed('broadcasting'),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListTile(
+                        leading: const Icon(Icons.qr_code_2),
+                        title: const Text('QRcode'),
+                        onTap: () => context.goNamed('qr_view'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ));
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit/repository/auth_reposiotory.dart';
 import 'package:habit/repository/store_reposiotory.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:uuid/uuid.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
@@ -38,3 +39,5 @@ final storeRepositoryProvider = Provider<StoreRepository>((ref) {
 
   return StoreRepository(ref, uid);
 });
+
+final qrResultProvider = StateProvider.autoDispose<Barcode?>((ref) => null);

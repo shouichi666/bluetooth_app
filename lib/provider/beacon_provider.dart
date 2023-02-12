@@ -13,20 +13,6 @@ import 'package:habit/provider/user_provider.dart';
 import 'package:habit/repository/store_reposiotory.dart';
 import 'package:habit/utilry/log/log.dart';
 
-final fetchStoreProvider = FutureProvider.family<BeaconState, String>((ref, uid) async {
-  final fetch = await Future.wait([
-    ref.read(storeRepositoryProvider).relativeBroadcast(),
-    ref.read(storeRepositoryProvider).relativeState(),
-  ]);
-
-  return BeaconState(
-    broadcasBeacon: fetch[0],
-    isBroadcasting: fetch[1].isBroadcasting,
-    isSomePermission: fetch[1].isSomePermission,
-    isScaning: fetch[1].isScaning,
-  );
-});
-
 final beaconControllerProvider =
     StateNotifierProvider<BeaconController, BeaconState>((ref) {
   return BeaconController(ref);
@@ -43,9 +29,8 @@ class BeaconController extends StateNotifier<BeaconState> {
 
   _init() async {
     if (mounted && await permissin()) {
-      getCurrentBeaconID();
-
       final fetch = await Future.wait([
+        _ref.read(storeRepositoryProvider).relativeScan(),
         _ref.read(storeRepositoryProvider).relativeBroadcast(),
         _ref.read(storeRepositoryProvider).relativeState(),
       ]);
@@ -53,10 +38,17 @@ class BeaconController extends StateNotifier<BeaconState> {
       pd(fetch);
 
       state = state.copyWith(
-        broadcasBeacon: fetch[0],
-        isBroadcasting: fetch[1]['isBroadcasting'] as bool,
-        isScaning: fetch[1]['isScaning'] as bool,
+        scanBeacon: fetch[0],
+        broadcasBeacon: fetch[1],
+        isBroadcasting: fetch[2]['isBroadcasting'] as bool,
+        isScaning: fetch[2]['isScaning'] as bool,
       );
+
+      if (state.isScaning) {
+        _startScan();
+      } else {
+        _stopScan();
+      }
     }
   }
 
@@ -74,35 +66,36 @@ class BeaconController extends StateNotifier<BeaconState> {
     }
   }
 
-  getCurrentBeaconID() async {
-    // fetch scan data store
-
-    state = state.copyWith(
-      uuid: 'B7BD853E-BA39-4A04-A20E-9A61E162BB23',
-      isBroadcasting: true,
-    );
-  }
-
   openPermissinPage() {}
 
-  toggleSwitchScan(bool e) {
-    pd(e);
+  toggleSwitchScan(bool e) async {
     if (!e) {
-      pd('debugText 2');
-      _stopScan();
+      await _stopScan();
     } else {
-      pd('debugText 1');
-      _startScan();
+      await _startScan();
     }
+
+    await _ref.read(storeRepositoryProvider).postState(state);
   }
 
-  handleScan() {
+  handleScanBeacon() async {
     if (state.isScaning) {
-      pd('debugText 2');
-      _stopScan();
+      await _stopScan();
     } else {
-      pd('debugText 1');
-      _startScan();
+      await _startScan();
+    }
+
+    await _ref.read(storeRepositoryProvider).postState(state);
+  }
+
+  handleScanCommit(BuildContext context, ScanBeacon beacon) async {
+    await _ref.read(storeRepositoryProvider).postScanBeacon(beacon);
+    state = state.copyWith(scanBeacon: beacon);
+
+    if (mounted) {
+      Navigator.of(context).pop();
+
+      context.go('/');
     }
   }
 
@@ -183,32 +176,43 @@ class BeaconController extends StateNotifier<BeaconState> {
       Region(identifier: 'com.beacon'),
     ];
 
-    pd('start');
-
     final interval = _ref.read(intervalControllerProvider.select((e) => e.value));
 
     await flutterBeacon.setBetweenScanPeriod(interval.toInt());
 
+    state = state.copyWith(isScaning: true);
+
     _streamRanging = flutterBeacon.ranging(r).listen((e) {
-      state = state.copyWith(isScaning: true);
-
       pd(e);
+      state = state.copyWith(
+        scanList: e.beacons.isEmpty
+            ? []
+            : e.beacons
+                .map(
+                  (s) => ScanBeacon(
+                    uuid: s.proximityUUID,
+                    major: s.major,
+                    minor: s.minor,
+                    rssi: s.rssi,
+                    accuracy: s.accuracy,
+                    proximity: s.proximity.name,
+                  ),
+                )
+                .toList(),
+      );
 
-      if (e.beacons.isNotEmpty) {
-        for (Beacon b in e.beacons) {
-          if (state.uuid == b.proximityUUID) {
-            state = state.copyWith(
-              scanBeacon: ScanBeacon(
-                uuid: b.proximityUUID,
-                major: b.major,
-                minor: b.minor,
-                rssi: b.rssi,
-                accuracy: b.accuracy,
-                proximity: b.proximity.name,
-              ),
-              isScaning: true,
-            );
-          }
+      for (Beacon b in e.beacons) {
+        if (state.scanBeacon.uuid == b.proximityUUID) {
+          state = state.copyWith(
+            scanBeacon: ScanBeacon(
+              uuid: b.proximityUUID,
+              major: b.major,
+              minor: b.minor,
+              rssi: b.rssi,
+              accuracy: b.accuracy,
+              proximity: b.proximity.name,
+            ),
+          );
         }
       }
     });
@@ -217,6 +221,9 @@ class BeaconController extends StateNotifier<BeaconState> {
   _stopScan() {
     _streamRanging?.pause();
 
-    state = state.copyWith(isScaning: false);
+    state = state.copyWith(
+      isScaning: false,
+      scanList: [],
+    );
   }
 }
