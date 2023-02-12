@@ -10,8 +10,6 @@ import 'package:habit/provider/auth_provider.dart';
 import 'package:habit/view/page/broadcast/broadcast.dart';
 import 'package:habit/view/page/home/home.dart';
 import 'package:habit/view/page/launch/launch.dart';
-import 'package:habit/view/page/qrscan/qrcan.dart';
-import 'package:habit/view/page/qrview/qrview.dart';
 import 'package:habit/view/page/register/register.dart';
 import 'package:habit/view/page/scan_list/scan_list.dart';
 import 'package:habit/view/page/setting/setting.dart';
@@ -97,24 +95,6 @@ class AsyncRouterNotifier extends ChangeNotifier {
               pageBuilder: (context, state) {
                 return MaterialPage(
                   child: ScanListPage(key: state.pageKey),
-                );
-              },
-            ),
-            GoRoute(
-              path: 'qr_view',
-              name: 'qr_view',
-              pageBuilder: (context, state) {
-                return MaterialPage(
-                  child: QrViewPage(key: state.pageKey),
-                );
-              },
-            ),
-            GoRoute(
-              path: 'qr_scan',
-              name: 'qr_scan',
-              pageBuilder: (context, state) {
-                return MaterialPage(
-                  child: QRscanPage(key: state.pageKey),
                 );
               },
             ),
