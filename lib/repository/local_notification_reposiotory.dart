@@ -84,6 +84,7 @@ class LocalNotificationRepository {
           'payload': payload.payload,
           'notificationResponseType': payload.notificationResponseType.name,
         };
+        pd(payload);
 
         onNotifications.add(jsonEncode(obj));
       },
@@ -115,8 +116,8 @@ class LocalNotificationRepository {
   Future<void> setNotification() async {
     await _flutterLocalNotificationsPlugin.periodicallyShow(
       0,
-      '出勤だよ',
-      '勤怠おす',
+      '出勤時間がちかい',
+      'スキャンを有効にしました',
       RepeatInterval.everyMinute,
       _platformChannelSpecifics,
       androidAllowWhileIdle: true,

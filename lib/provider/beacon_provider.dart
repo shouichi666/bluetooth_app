@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:habit/model/beacon/beacon.dart';
 import 'package:habit/provider/common_provider.dart';
 import 'package:habit/provider/interval_provider.dart';
+import 'package:habit/provider/local_notification_provider.dart';
 import 'package:habit/provider/user_provider.dart';
 import 'package:habit/repository/store_reposiotory.dart';
 import 'package:habit/utilry/log/log.dart';
@@ -35,7 +36,7 @@ class BeaconController extends StateNotifier<BeaconState> {
         _ref.read(storeRepositoryProvider).relativeState(),
       ]);
 
-      pd(fetch);
+      pd(fetch[0]);
 
       state = state.copyWith(
         scanBeacon: fetch[0],
@@ -50,6 +51,21 @@ class BeaconController extends StateNotifier<BeaconState> {
         _stopScan();
       }
     }
+
+    _ref.listenSelf((previous, next) {
+      final p = previous as BeaconState;
+      final s = next as BeaconState;
+
+      // pd(p.scanBeacon);
+      // pd(p.scanBeacon.proximity);
+
+      if (s.isScaning &&
+          // p.scanBeacon.proximity != s.scanBeacon.proximity &&
+          s.scanBeacon.proximity == 'immediate') {
+        _ref.read(localNotificationControllerProvider.notifier).show();
+        // pe('show');
+      }
+    });
   }
 
   Future<bool> permissin() async {
@@ -90,6 +106,7 @@ class BeaconController extends StateNotifier<BeaconState> {
 
   handleScanCommit(BuildContext context, ScanBeacon beacon) async {
     await _ref.read(storeRepositoryProvider).postScanBeacon(beacon);
+    pd('debugText');
     state = state.copyWith(scanBeacon: beacon);
 
     if (mounted) {
@@ -183,7 +200,6 @@ class BeaconController extends StateNotifier<BeaconState> {
     state = state.copyWith(isScaning: true);
 
     _streamRanging = flutterBeacon.ranging(r).listen((e) {
-      pd(e);
       state = state.copyWith(
         scanList: e.beacons.isEmpty
             ? []
@@ -201,19 +217,39 @@ class BeaconController extends StateNotifier<BeaconState> {
                 .toList(),
       );
 
-      for (Beacon b in e.beacons) {
-        if (state.scanBeacon.uuid == b.proximityUUID) {
-          state = state.copyWith(
-            scanBeacon: ScanBeacon(
-              uuid: b.proximityUUID,
-              major: b.major,
-              minor: b.minor,
-              rssi: b.rssi,
-              accuracy: b.accuracy,
-              proximity: b.proximity.name,
-            ),
-          );
+      if (e.beacons.isNotEmpty) {
+        for (Beacon b in e.beacons) {
+          // pd(b);
+          if (state.scanBeacon.uuid == b.proximityUUID) {
+            if (state.scanBeacon.proximity == b.proximity.name) {
+              state = state.copyWith(
+                scanBeacon: ScanBeacon(
+                  uuid: b.proximityUUID,
+                  major: b.major,
+                  minor: b.minor,
+                  rssi: b.rssi,
+                  accuracy: b.accuracy,
+                  proximity: state.scanBeacon.proximity,
+                ),
+                isScanLoading: false,
+              );
+            } else {
+              state = state.copyWith(
+                scanBeacon: ScanBeacon(
+                  uuid: b.proximityUUID,
+                  major: b.major,
+                  minor: b.minor,
+                  rssi: b.rssi,
+                  accuracy: b.accuracy,
+                  proximity: b.proximity.name,
+                ),
+                isScanLoading: false,
+              );
+            }
+          }
         }
+      } else {
+        state = state.copyWith(isScanLoading: true);
       }
     });
   }

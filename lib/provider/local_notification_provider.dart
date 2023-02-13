@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:habit/repository/local_notification_reposiotory.dart';
-import 'package:habit/utilry/log/log.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final localNotificationControllerProvider =
@@ -24,16 +23,24 @@ class LocalNotificationController
     _localNotification = LocalNotificationRepository();
     _localNotification.init();
     state = await _localNotification.pending();
-  }
 
-  listen() {
     LocalNotificationRepository.onNotifications.listen((value) async {
-      pd(value);
-
       final url = Uri.parse(
-          'https://pnt.tsukasa.cloud/user/comm/id/XEqIMK1mfQOKlYjocHoM2KKH7Tj2/?id=23');
+        'https://pnt.tsukasa.cloud/user/comm/id/XEqIMK1mfQOKlYjocHoM2KKH7Tj2/?id=23',
+      );
       !await launchUrl(url);
     });
+  }
+
+  listen() {}
+
+  show() async {
+    await _localNotification.show(
+      id: 0,
+      title: 'title',
+      body: 'body',
+      payload: 'payload',
+    );
   }
 
   set() {

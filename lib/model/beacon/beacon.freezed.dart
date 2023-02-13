@@ -26,6 +26,7 @@ mixin _$BeaconState {
   bool get isScaning => throw _privateConstructorUsedError;
   bool get isBroadcasting => throw _privateConstructorUsedError;
   bool get isSomePermission => throw _privateConstructorUsedError;
+  bool get isScanLoading => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -45,7 +46,8 @@ abstract class $BeaconStateCopyWith<$Res> {
       List<ScanBeacon> scanList,
       bool isScaning,
       bool isBroadcasting,
-      bool isSomePermission});
+      bool isSomePermission,
+      bool isScanLoading});
 
   $ScanBeaconCopyWith<$Res> get scanBeacon;
   $BroadcastBeaconCopyWith<$Res> get broadcasBeacon;
@@ -70,6 +72,7 @@ class _$BeaconStateCopyWithImpl<$Res, $Val extends BeaconState>
     Object? isScaning = null,
     Object? isBroadcasting = null,
     Object? isSomePermission = null,
+    Object? isScanLoading = null,
   }) {
     return _then(_value.copyWith(
       scanBeacon: null == scanBeacon
@@ -95,6 +98,10 @@ class _$BeaconStateCopyWithImpl<$Res, $Val extends BeaconState>
       isSomePermission: null == isSomePermission
           ? _value.isSomePermission
           : isSomePermission // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isScanLoading: null == isScanLoading
+          ? _value.isScanLoading
+          : isScanLoading // ignore: cast_nullable_to_non_nullable
               as bool,
     ) as $Val);
   }
@@ -130,7 +137,8 @@ abstract class _$$_BeaconStateCopyWith<$Res>
       List<ScanBeacon> scanList,
       bool isScaning,
       bool isBroadcasting,
-      bool isSomePermission});
+      bool isSomePermission,
+      bool isScanLoading});
 
   @override
   $ScanBeaconCopyWith<$Res> get scanBeacon;
@@ -155,6 +163,7 @@ class __$$_BeaconStateCopyWithImpl<$Res>
     Object? isScaning = null,
     Object? isBroadcasting = null,
     Object? isSomePermission = null,
+    Object? isScanLoading = null,
   }) {
     return _then(_$_BeaconState(
       scanBeacon: null == scanBeacon
@@ -181,6 +190,10 @@ class __$$_BeaconStateCopyWithImpl<$Res>
           ? _value.isSomePermission
           : isSomePermission // ignore: cast_nullable_to_non_nullable
               as bool,
+      isScanLoading: null == isScanLoading
+          ? _value.isScanLoading
+          : isScanLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -194,7 +207,8 @@ class _$_BeaconState with DiagnosticableTreeMixin implements _BeaconState {
       final List<ScanBeacon> scanList = const [],
       this.isScaning = false,
       this.isBroadcasting = true,
-      this.isSomePermission = true})
+      this.isSomePermission = true,
+      this.isScanLoading = true})
       : _scanList = scanList;
 
   factory _$_BeaconState.fromJson(Map<String, dynamic> json) =>
@@ -224,10 +238,13 @@ class _$_BeaconState with DiagnosticableTreeMixin implements _BeaconState {
   @override
   @JsonKey()
   final bool isSomePermission;
+  @override
+  @JsonKey()
+  final bool isScanLoading;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'BeaconState(scanBeacon: $scanBeacon, broadcasBeacon: $broadcasBeacon, scanList: $scanList, isScaning: $isScaning, isBroadcasting: $isBroadcasting, isSomePermission: $isSomePermission)';
+    return 'BeaconState(scanBeacon: $scanBeacon, broadcasBeacon: $broadcasBeacon, scanList: $scanList, isScaning: $isScaning, isBroadcasting: $isBroadcasting, isSomePermission: $isSomePermission, isScanLoading: $isScanLoading)';
   }
 
   @override
@@ -240,7 +257,8 @@ class _$_BeaconState with DiagnosticableTreeMixin implements _BeaconState {
       ..add(DiagnosticsProperty('scanList', scanList))
       ..add(DiagnosticsProperty('isScaning', isScaning))
       ..add(DiagnosticsProperty('isBroadcasting', isBroadcasting))
-      ..add(DiagnosticsProperty('isSomePermission', isSomePermission));
+      ..add(DiagnosticsProperty('isSomePermission', isSomePermission))
+      ..add(DiagnosticsProperty('isScanLoading', isScanLoading));
   }
 
   @override
@@ -258,7 +276,9 @@ class _$_BeaconState with DiagnosticableTreeMixin implements _BeaconState {
             (identical(other.isBroadcasting, isBroadcasting) ||
                 other.isBroadcasting == isBroadcasting) &&
             (identical(other.isSomePermission, isSomePermission) ||
-                other.isSomePermission == isSomePermission));
+                other.isSomePermission == isSomePermission) &&
+            (identical(other.isScanLoading, isScanLoading) ||
+                other.isScanLoading == isScanLoading));
   }
 
   @JsonKey(ignore: true)
@@ -270,7 +290,8 @@ class _$_BeaconState with DiagnosticableTreeMixin implements _BeaconState {
       const DeepCollectionEquality().hash(_scanList),
       isScaning,
       isBroadcasting,
-      isSomePermission);
+      isSomePermission,
+      isScanLoading);
 
   @JsonKey(ignore: true)
   @override
@@ -293,7 +314,8 @@ abstract class _BeaconState implements BeaconState {
       final List<ScanBeacon> scanList,
       final bool isScaning,
       final bool isBroadcasting,
-      final bool isSomePermission}) = _$_BeaconState;
+      final bool isSomePermission,
+      final bool isScanLoading}) = _$_BeaconState;
 
   factory _BeaconState.fromJson(Map<String, dynamic> json) =
       _$_BeaconState.fromJson;
@@ -310,6 +332,8 @@ abstract class _BeaconState implements BeaconState {
   bool get isBroadcasting;
   @override
   bool get isSomePermission;
+  @override
+  bool get isScanLoading;
   @override
   @JsonKey(ignore: true)
   _$$_BeaconStateCopyWith<_$_BeaconState> get copyWith =>

@@ -24,6 +24,7 @@ _$_BeaconState _$$_BeaconStateFromJson(Map<String, dynamic> json) =>
       isScaning: json['isScaning'] as bool? ?? false,
       isBroadcasting: json['isBroadcasting'] as bool? ?? true,
       isSomePermission: json['isSomePermission'] as bool? ?? true,
+      isScanLoading: json['isScanLoading'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$$_BeaconStateToJson(_$_BeaconState instance) =>
@@ -34,6 +35,7 @@ Map<String, dynamic> _$$_BeaconStateToJson(_$_BeaconState instance) =>
       'isScaning': instance.isScaning,
       'isBroadcasting': instance.isBroadcasting,
       'isSomePermission': instance.isSomePermission,
+      'isScanLoading': instance.isScanLoading,
     };
 
 _$_ScanBeacon _$$_ScanBeaconFromJson(Map<String, dynamic> json) =>

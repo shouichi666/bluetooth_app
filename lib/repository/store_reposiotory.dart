@@ -75,7 +75,10 @@ class StoreRepository {
   }
 
   postScanBeacon(ScanBeacon beacon) async {
-    await _udoc.collection('scan').doc(_uid).set(beacon.toJson());
+    await _udoc.collection('scan').doc(_uid).set(
+          beacon.toJson(),
+          SetOptions(merge: true),
+        );
   }
 
   postBroadcast(BroadcastBeacon model) async {

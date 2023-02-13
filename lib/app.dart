@@ -24,7 +24,7 @@ class App extends ConsumerWidget {
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
-        colorSchemeSeed: Colors.lightBlueAccent,
+        colorSchemeSeed: Colors.blueGrey,
       ),
     );
   }

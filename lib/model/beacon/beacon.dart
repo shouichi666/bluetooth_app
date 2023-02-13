@@ -13,6 +13,7 @@ abstract class BeaconState with _$BeaconState {
     @Default(false) bool isScaning,
     @Default(true) bool isBroadcasting,
     @Default(true) bool isSomePermission,
+    @Default(true) bool isScanLoading,
   }) = _BeaconState;
 
   factory BeaconState.fromJson(Map<String, dynamic> json) => _$BeaconStateFromJson(json);
