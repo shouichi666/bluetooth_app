@@ -12,7 +12,6 @@ import 'package:habit/view/page/home/home.dart';
 import 'package:habit/view/page/launch/launch.dart';
 import 'package:habit/view/page/register/register.dart';
 import 'package:habit/view/page/scan_list/scan_list.dart';
-import 'package:habit/view/page/setting/setting.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = AsyncRouterNotifier(ref);
@@ -95,15 +94,6 @@ class AsyncRouterNotifier extends ChangeNotifier {
               pageBuilder: (context, state) {
                 return MaterialPage(
                   child: ScanListPage(key: state.pageKey),
-                );
-              },
-            ),
-            GoRoute(
-              path: 'setting',
-              name: 'setting',
-              pageBuilder: (context, state) {
-                return MaterialPage(
-                  child: SettingPage(key: state.pageKey),
                 );
               },
             ),

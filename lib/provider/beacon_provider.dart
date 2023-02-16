@@ -14,6 +14,8 @@ import 'package:habit/provider/user_provider.dart';
 import 'package:habit/repository/store_reposiotory.dart';
 import 'package:habit/utilry/log/log.dart';
 
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+
 final beaconControllerProvider =
     StateNotifierProvider<BeaconController, BeaconState>((ref) {
   return BeaconController(ref);
@@ -36,8 +38,6 @@ class BeaconController extends StateNotifier<BeaconState> {
         _ref.read(storeRepositoryProvider).relativeState(),
       ]);
 
-      pd(fetch[0]);
-
       state = state.copyWith(
         scanBeacon: fetch[0],
         broadcasBeacon: fetch[1],
@@ -52,20 +52,20 @@ class BeaconController extends StateNotifier<BeaconState> {
       }
     }
 
-    _ref.listenSelf((previous, next) {
-      final p = previous as BeaconState;
-      final s = next as BeaconState;
+    // _ref.listenSelf((previous, next) {
+    //   final p = previous as BeaconState;
+    //   final s = next as BeaconState;
 
-      // pd(p.scanBeacon);
-      // pd(p.scanBeacon.proximity);
+    //   pd(p.scanBeacon);
+    //   // pd(p.scanBeacon.proximity);
 
-      if (s.isScaning &&
-          // p.scanBeacon.proximity != s.scanBeacon.proximity &&
-          s.scanBeacon.proximity == 'immediate') {
-        _ref.read(localNotificationControllerProvider.notifier).show();
-        // pe('show');
-      }
-    });
+    //   if (s.isScaning &&
+    //       // p.scanBeacon.proximity != s.scanBeacon.proximity &&
+    //       s.scanBeacon.proximity == 'immediate') {
+    //     _ref.read(localNotificationControllerProvider.notifier).show();
+    //     // pe('show');
+    //   }
+    // });
   }
 
   Future<bool> permissin() async {
@@ -190,7 +190,7 @@ class BeaconController extends StateNotifier<BeaconState> {
 
   _startScan() async {
     final List<Region> r = [
-      Region(identifier: 'com.beacon'),
+      Region(identifier: 'com.baecon'),
     ];
 
     final interval = _ref.read(intervalControllerProvider.select((e) => e.value));
@@ -200,6 +200,8 @@ class BeaconController extends StateNotifier<BeaconState> {
     state = state.copyWith(isScaning: true);
 
     _streamRanging = flutterBeacon.ranging(r).listen((e) {
+      // pd(e);
+
       state = state.copyWith(
         scanList: e.beacons.isEmpty
             ? []
@@ -221,31 +223,19 @@ class BeaconController extends StateNotifier<BeaconState> {
         for (Beacon b in e.beacons) {
           // pd(b);
           if (state.scanBeacon.uuid == b.proximityUUID) {
-            if (state.scanBeacon.proximity == b.proximity.name) {
-              state = state.copyWith(
-                scanBeacon: ScanBeacon(
-                  uuid: b.proximityUUID,
-                  major: b.major,
-                  minor: b.minor,
-                  rssi: b.rssi,
-                  accuracy: b.accuracy,
-                  proximity: state.scanBeacon.proximity,
-                ),
-                isScanLoading: false,
-              );
-            } else {
-              state = state.copyWith(
-                scanBeacon: ScanBeacon(
-                  uuid: b.proximityUUID,
-                  major: b.major,
-                  minor: b.minor,
-                  rssi: b.rssi,
-                  accuracy: b.accuracy,
-                  proximity: b.proximity.name,
-                ),
-                isScanLoading: false,
-              );
-            }
+            final isSameProximity = state.scanBeacon.proximity == b.proximity.name;
+            state = state.copyWith(
+              scanBeacon: ScanBeacon(
+                uuid: b.proximityUUID,
+                major: b.major,
+                minor: b.minor,
+                rssi: b.rssi,
+                accuracy: b.accuracy,
+                proximity:
+                    isSameProximity ? state.scanBeacon.proximity : b.proximity.name,
+              ),
+              isScanLoading: false,
+            );
           }
         }
       } else {

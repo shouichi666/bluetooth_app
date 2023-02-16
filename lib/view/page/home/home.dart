@@ -1,67 +1,41 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_beacon/flutter_beacon.dart';
+import 'package:habit/provider/auth_provider.dart';
+import 'package:habit/provider/task_provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sleek_circular_slider/sleek_circular_slider.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
+
 import 'package:habit/provider/beacon_provider.dart';
 import 'package:habit/provider/interval_provider.dart';
 import 'package:habit/provider/local_notification_provider.dart';
 import 'package:habit/view/component/card.dart';
-import 'package:sleek_circular_slider/sleek_circular_slider.dart';
-import 'package:syncfusion_flutter_sliders/sliders.dart';
-
 // import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:habit/constant/size.dart';
 import 'package:habit/constant/style.dart';
 
-class HomePage extends ConsumerStatefulWidget {
+class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends ConsumerState<HomePage> {
-  // late SharedPreferences _prefs;
-
-  // @override
-  // void dispose() {
-  //   _streamRanging?.cancel();
-  //   super.dispose();
-  // }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scanBeacon = ref.watch(beaconControllerProvider.select((e) => e.scanBeacon));
 
     final baeconAction = ref.read(beaconControllerProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('HoGEe'),
+        title: const Text('HoGee'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => context.goNamed('register'),
-            // onPressed: () => context.goNamed('qr_scan'),
           ),
-          // IconButton(
-          //   icon: const Icon(Icons.broadcast_on_personal_outlined),
-          //   onPressed: () => context.goNamed('broadcasting'),
-          // ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () => context.goNamed('scan_list'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              // flutterBeacon.stopBroadcast();
-              // _streamRanging?.cancel();
-
-              flutterBeacon.close;
-            },
           ),
         ],
       ),
@@ -79,7 +53,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ? Stack(
                         fit: StackFit.passthrough,
                         alignment: Alignment.center,
-                        // crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Positioned(
                             top: 0,
@@ -93,60 +66,49 @@ class _HomePageState extends ConsumerState<HomePage> {
                               ],
                             ),
                           ),
-                          Padding(
+                          Container(
+                            alignment: Alignment.center,
                             padding: const EdgeInsets.symmetric(vertical: S4),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 180,
-                                  height: 180,
-                                  child: ref.watch(beaconControllerProvider
-                                          .select((e) => e.isScanLoading))
-                                      ? const Center(
-                                          child: CircularProgressIndicator(),
-                                        )
-                                      : SleekCircularSlider(
-                                          appearance: CircularSliderAppearance(
-                                            animationEnabled: false,
-                                            customWidths: CustomSliderWidths(
-                                              trackWidth: 1,
-                                              progressBarWidth: 18,
-                                              shadowWidth: 60,
-                                            ),
-                                            startAngle: 180,
-                                            angleRange: 240,
-                                            infoProperties: InfoProperties(
-                                              topLabelText: scanBeacon.proximity,
-                                              topLabelStyle: const TextStyle(
-                                                fontSize: 12.0,
-                                                fontWeight: FontWeight.w100,
-                                              ),
-                                              mainLabelStyle: const TextStyle(
-                                                fontSize: 20.0,
-                                                fontWeight: FontWeight.w100,
-                                              ),
-                                              modifier: (double value) {
-                                                final volume = value.toInt();
-                                                return '- $volume dBm';
-                                              },
-                                              bottomLabelStyle: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                              bottomLabelText: 'RSSI',
-                                            ),
-                                            size: 180.0,
-                                            counterClockwise: true,
-                                            animDurationMultiplier: .9,
-                                          ),
-                                          initialValue: scanBeacon.rssi.toDouble() < 0
-                                              ? scanBeacon.rssi.toDouble() * -1
-                                              : scanBeacon.rssi.toDouble() * 1,
+                            width: 210,
+                            height: 210,
+                            child: ref.watch(beaconControllerProvider
+                                    .select((e) => e.isScanLoading))
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : SleekCircularSlider(
+                                    initialValue: scanBeacon.rssi.toDouble() *
+                                        (scanBeacon.rssi.toDouble() < 0 ? -1 : 1),
+                                    appearance: CircularSliderAppearance(
+                                      counterClockwise: true,
+                                      animationEnabled: false,
+                                      startAngle: 180,
+                                      angleRange: 240,
+                                      animDurationMultiplier: .9,
+                                      customWidths: CustomSliderWidths(
+                                        trackWidth: 1,
+                                        progressBarWidth: 14,
+                                        shadowWidth: 58,
+                                      ),
+                                      infoProperties: InfoProperties(
+                                        topLabelText: scanBeacon.proximity,
+                                        modifier: (value) => '- ${value.toInt()} dBm',
+                                        bottomLabelText: 'RSSI',
+                                        topLabelStyle: const TextStyle(
+                                          fontSize: 12.0,
+                                          fontWeight: FontWeight.w100,
                                         ),
-                                ),
-                              ],
-                            ),
+                                        mainLabelStyle: const TextStyle(
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.w100,
+                                        ),
+                                        bottomLabelStyle: const TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w200,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                           ),
                           Positioned(
                             bottom: 0,
@@ -175,7 +137,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ],
                       )
                     : const Center(
-                        child: Text('STOP NOW'),
+                        child: Text('STOP'),
                       ),
               ),
             ),
@@ -190,8 +152,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                       label: 'Scan',
                       content: '',
-                      // content:
-                      //     ref.watch(intervalControllerProvider.select((e) => e.label)),
                       value:
                           ref.watch(beaconControllerProvider.select((e) => e.isScaning)),
                       onTap: baeconAction.handleScanBeacon,
@@ -242,56 +202,20 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                   ],
                 ),
-                GAP2,
-                Row(
-                  children: const [
-                    Text('action'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    ActionCard(
-                      icon: const Icon(Icons.task_alt_rounded),
-                      label: 'Task 01',
-                      content: '',
-                      value: false,
-                      onChanged: (e) {},
-                      onTap: null,
-                      moreAction: () {},
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    ActionCard(
-                      icon: const Icon(Icons.task_alt_rounded),
-                      label: 'Task 02',
-                      content: '',
-                      value: false,
-                      onChanged: (e) {},
-                      onTap: null,
-                      moreAction: () {},
-                    ),
-                  ],
-                ),
+                GAP3,
+                const Tasks(),
               ],
             ),
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: SizedBox(
-        width: 80,
-        height: 80,
-        child: FloatingActionButton(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(90.0)),
-          // elevation: isVisible ? 0.0 : null,
-          onPressed: baeconAction.handleScanBeacon,
-          child: Icon(
-            ref.watch(beaconControllerProvider.select((e) => e.isScaning))
-                ? Icons.stop
-                : Icons.power_settings_new,
-          ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
+      floatingActionButton: FloatingActionButton(
+        onPressed: baeconAction.handleScanBeacon,
+        child: Icon(
+          ref.watch(beaconControllerProvider.select((e) => e.isScaning))
+              ? Icons.stop
+              : Icons.power_settings_new,
         ),
       ),
       bottomNavigationBar: AnimatedContainer(
@@ -302,7 +226,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           child: Row(
             children: [
               IconButton(
-                tooltip: 'Open popup menu',
+                onPressed: ref.read(authControllerProvider.notifier).signOut,
+                icon: const Icon(Icons.logout),
+              ),
+              IconButton(
                 icon: const Icon(Icons.notifications),
                 onPressed: () {
                   ref.read(localNotificationControllerProvider.notifier).set();
@@ -315,13 +242,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                   );
 
-                  // Find the ScaffoldMessenger in the widget tree
-                  // and use it to show a SnackBar.
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 },
               ),
               IconButton(
-                tooltip: 'Open popup menu',
                 icon: const Icon(Icons.stop_screen_share_sharp),
                 onPressed: () {
                   ref.read(localNotificationControllerProvider.notifier).set();
@@ -334,8 +258,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                   );
 
-                  // Find the ScaffoldMessenger in the widget tree
-                  // and use it to show a SnackBar.
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 },
               ),
@@ -506,49 +428,90 @@ class SelectBroadCast extends ConsumerWidget {
   }
 }
 
-class DrumRoll extends StatelessWidget {
-  const DrumRoll({
-    super.key,
-    required this.scrollController,
-    required this.list,
-    required this.currnt,
-    required this.onChanged,
-  });
-
-  final ScrollController scrollController;
-  final List<String> list;
-  final String currnt;
-  final Function(int) onChanged;
+class Tasks extends ConsumerWidget {
+  const Tasks({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (ScrollNotification scrollnotification) {
-        return true;
-      },
-      child: ListWheelScrollView(
-        controller: scrollController,
-        physics: const FixedExtentScrollPhysics(),
-        itemExtent: 96,
-        diameterRatio: .61,
-        onSelectedItemChanged: onChanged,
-        children: list.map((String selectItem) {
-          return Center(
-            child: Text(
-              selectItem,
-              style: selectItem == currnt
-                  ? Theme.of(context)
-                      .textTheme
-                      .displaySmall!
-                      .copyWith(fontWeight: FontWeight.w600)
-                  : Theme.of(context)
-                      .textTheme
-                      .headlineMedium!
-                      .copyWith(color: Colors.blueGrey.shade300),
-            ),
-          );
-        }).toList(),
-      ),
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref.watch(taskControllerProvider).when(
+          loading: () => const CircularProgressIndicator(),
+          error: (error, stackTrace) => Text(error.toString()),
+          data: (data) {
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: S2),
+                  child: Row(
+                    children: const [
+                      Text('Tasks'),
+                    ],
+                  ),
+                ),
+                for (var task in data)
+                  Row(
+                    children: [
+                      ActionCard(
+                        icon: const Icon(Icons.task_alt_rounded),
+                        label: 'Task 0${task.id}  -  ${task.runAt?.toString()}',
+                        content: task.label,
+                        // value: task.updateAt!.isAfter(
+                        //   DateTime.parse("2023-02-13 12:30:00"),
+                        // ),
+                        value: task.runAt?.isBefore(DateTime.now()) ?? false,
+                        onChanged: (e) {},
+                        onTap: () async =>
+                            await ref.read(taskControllerProvider.notifier).runTask(task),
+                        moreAction: () {},
+                      ),
+                    ],
+                  ),
+              ],
+            );
+          },
+        );
+  }
+}
+
+class Hoge extends ConsumerWidget {
+  const Hoge({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref.watch(taskControllerProvider).when(
+          loading: () => const CircularProgressIndicator(),
+          error: (error, stackTrace) => Text(error.toString()),
+          data: (data) {
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: S2),
+                  child: Row(
+                    children: const [
+                      Text('Tasks'),
+                    ],
+                  ),
+                ),
+                for (var task in data)
+                  Row(
+                    children: [
+                      ActionCard(
+                        icon: const Icon(Icons.task_alt_rounded),
+                        label: 'Task 0${task.id}  -  ${task.runAt!.toString()}',
+                        content: task.label,
+                        // value: task.updateAt!.isAfter(
+                        //   DateTime.parse("2023-02-13 12:30:00"),
+                        // ),
+                        value: task.runAt!.isBefore(DateTime.now()),
+                        onChanged: (e) {},
+                        onTap: () async =>
+                            await ref.read(taskControllerProvider.notifier).runTask(task),
+                        moreAction: () {},
+                      ),
+                    ],
+                  ),
+              ],
+            );
+          },
+        );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:habit/model/beacon/beacon.dart';
+import 'package:habit/model/task/task.dart';
 import 'package:habit/provider/user_provider.dart';
 import 'package:habit/utilry/log/log.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -28,15 +29,32 @@ class StoreRepository {
     // pd(exits);
 
     if (!exits) {
-      _ref.read(storeProvider).collection('user').doc(_uid).set(
+      await _ref.read(storeProvider).collection('user').doc(_uid).set(
         {
           'uid': user.uid,
           'name': user.displayName,
           'token': await user.getIdToken(),
         },
       );
+
+      await postTask(
+        const Task(
+          id: '1',
+          label: 'Being as work',
+          isDoned: false,
+          updateAt: null,
+        ),
+      );
+      await postTask(
+        const Task(
+          id: '2',
+          label: 'Leaving as work',
+          isDoned: false,
+          updateAt: null,
+        ),
+      );
     } else {
-      _ref.read(storeProvider).collection('user').doc(_uid).update(
+      await _ref.read(storeProvider).collection('user').doc(_uid).update(
         {
           'uid': user.uid,
           'name': user.displayName,
@@ -74,6 +92,12 @@ class StoreRepository {
     return state;
   }
 
+  Future<List<Task>> relativeTasks() async {
+    final taskDoc = await _udoc.collection('task').get().then((e) => e.docs);
+
+    return taskDoc.map((e) => Task.fromJson(e.data())).toList();
+  }
+
   postScanBeacon(ScanBeacon beacon) async {
     await _udoc.collection('scan').doc(_uid).set(
           beacon.toJson(),
@@ -94,6 +118,19 @@ class StoreRepository {
         'isScaning': model.isScaning,
         'isSomePermission': model.isSomePermission,
       },
+    );
+  }
+
+  postTask(Task task) async {
+    await _udoc.collection('task').doc(task.id).set(
+      {
+        'id': task.id,
+        'isDoned': task.isDoned,
+        'label': task.label,
+        'runAt': task.runAt,
+        'updateAt': task.updateAt,
+      },
+      SetOptions(merge: true),
     );
   }
 

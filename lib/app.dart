@@ -1,5 +1,6 @@
 import 'package:habit/provider/beacon_provider.dart';
 import 'package:habit/provider/local_notification_provider.dart';
+import 'package:habit/provider/task_provider.dart';
 import 'package:habit/route/route.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,7 @@ class App extends ConsumerWidget {
     final router = ref.watch(routerProvider);
 
     ref.read(localNotificationControllerProvider);
+    ref.read(taskControllerProvider);
     ref.read(beaconControllerProvider);
 
     return MaterialApp.router(

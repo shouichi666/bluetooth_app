@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit/constant/size.dart';
 import 'package:habit/constant/style.dart';
 import 'package:habit/provider/beacon_provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ScanListPage extends ConsumerWidget {
+class ScanListPage extends HookConsumerWidget {
   const ScanListPage({super.key});
 
   @override

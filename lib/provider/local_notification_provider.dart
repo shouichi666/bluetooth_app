@@ -34,11 +34,15 @@ class LocalNotificationController
 
   listen() {}
 
-  show() async {
+  show({
+    required String id,
+    required String title,
+    required String body,
+  }) async {
     await _localNotification.show(
-      id: 0,
-      title: 'title',
-      body: 'body',
+      id: int.parse(id),
+      title: title,
+      body: body,
       payload: 'payload',
     );
   }
