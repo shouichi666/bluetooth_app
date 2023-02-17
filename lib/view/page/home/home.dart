@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:habit/provider/auth_provider.dart';
 import 'package:habit/provider/task_provider.dart';
+import 'package:habit/utilry/log/log.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
@@ -39,174 +40,181 @@ class HomePage extends HookConsumerWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(S2),
-        child: Column(
-          children: [
-            Card(
-              shape: SHERPE_ALL,
-              color: Colors.black,
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(S3),
-                child: ref.watch(beaconControllerProvider.select((e) => e.isScaning))
-                    ? Stack(
-                        fit: StackFit.passthrough,
-                        alignment: Alignment.center,
-                        children: [
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            child: Row(
-                              children: [
-                                Text(
-                                  scanBeacon.uuid,
-                                  style: Theme.of(context).textTheme.titleMedium,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            alignment: Alignment.center,
-                            padding: const EdgeInsets.symmetric(vertical: S4),
-                            width: 210,
-                            height: 210,
-                            child: ref.watch(beaconControllerProvider
-                                    .select((e) => e.isScanLoading))
-                                ? const Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : SleekCircularSlider(
-                                    initialValue: scanBeacon.rssi.toDouble() *
-                                        (scanBeacon.rssi.toDouble() < 0 ? -1 : 1),
-                                    appearance: CircularSliderAppearance(
-                                      counterClockwise: true,
-                                      animationEnabled: false,
-                                      startAngle: 180,
-                                      angleRange: 240,
-                                      animDurationMultiplier: .9,
-                                      customWidths: CustomSliderWidths(
-                                        trackWidth: 1,
-                                        progressBarWidth: 14,
-                                        shadowWidth: 58,
-                                      ),
-                                      infoProperties: InfoProperties(
-                                        topLabelText: scanBeacon.proximity,
-                                        modifier: (value) => '- ${value.toInt()} dBm',
-                                        bottomLabelText: 'RSSI',
-                                        topLabelStyle: const TextStyle(
-                                          fontSize: 12.0,
-                                          fontWeight: FontWeight.w100,
-                                        ),
-                                        mainLabelStyle: const TextStyle(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.w100,
-                                        ),
-                                        bottomLabelStyle: const TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w200,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: S1),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          pd('refresh');
+          ref.invalidate(taskControllerProvider);
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(S2),
+          child: Column(
+            children: [
+              Card(
+                shape: SHERPE_ALL,
+                color: Colors.black,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(S3),
+                  child: ref.watch(beaconControllerProvider.select((e) => e.isScaning))
+                      ? Stack(
+                          fit: StackFit.passthrough,
+                          alignment: Alignment.center,
+                          children: [
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              child: Row(
                                 children: [
                                   Text(
-                                    'Major : ${scanBeacon.major}',
-                                    style: Theme.of(context).textTheme.labelLarge,
-                                  ),
-                                  Text(
-                                    'Minor : ${scanBeacon.minor}',
-                                    style: Theme.of(context).textTheme.labelLarge,
-                                  ),
-                                  Text(
-                                    'Accuracy : ${scanBeacon.accuracy}m',
-                                    style: Theme.of(context).textTheme.labelLarge,
+                                    scanBeacon.uuid,
+                                    style: Theme.of(context).textTheme.titleMedium,
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                    : const Center(
-                        child: Text('STOP'),
-                      ),
-              ),
-            ),
-            Column(
-              children: [
-                Row(
-                  children: [
-                    ActionCard(
-                      icon: const Icon(
-                        Icons.settings_remote_sharp,
-                        // color: Colors.purpleAccent,
-                      ),
-                      label: 'Scan',
-                      content: '',
-                      value:
-                          ref.watch(beaconControllerProvider.select((e) => e.isScaning)),
-                      onTap: baeconAction.handleScanBeacon,
-                      onChanged: (e) => baeconAction.toggleSwitchScan(e),
-                      moreAction: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          clipBehavior: Clip.antiAlias,
-                          shape: SHERPE_TOP,
-                          constraints: BoxConstraints(
-                            maxHeight: MediaQuery.of(context).size.height * 0.5,
-                          ),
-                          builder: ((context) {
-                            return const SelectTime();
-                          }),
-                        );
-                      },
-                    ),
-                    ActionCard(
-                      icon: const Icon(
-                        Icons.broadcast_on_personal,
-                        // color: Colors.lightBlue,
-                      ),
-                      label: 'Broadcast',
-                      content: ref.watch(
-                              beaconControllerProvider.select((e) => e.isBroadcasting))
-                          ? ''
-                          : '',
-                      value: ref.watch(
-                          beaconControllerProvider.select((e) => e.isBroadcasting)),
-                      onChanged: (e) async => ref
-                          .read(beaconControllerProvider.notifier)
-                          .handleToggleBroadcast(context),
-                      onTap: () async => ref
-                          .read(beaconControllerProvider.notifier)
-                          .handleToggleBroadcast(context),
-                      moreAction: () {
-                        showModalBottomSheet(
-                          context: context,
-                          clipBehavior: Clip.antiAlias,
-                          shape: SHERPE_TOP,
-                          builder: ((context) {
-                            return const SelectBroadCast();
-                          }),
-                        );
-                      },
-                    ),
-                  ],
+                            Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(vertical: S4),
+                              width: 210,
+                              height: 210,
+                              child: ref.watch(beaconControllerProvider
+                                      .select((e) => e.isScanLoading))
+                                  ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : SleekCircularSlider(
+                                      initialValue: scanBeacon.rssi.toDouble() *
+                                          (scanBeacon.rssi.toDouble() < 0 ? -1 : 1),
+                                      appearance: CircularSliderAppearance(
+                                        counterClockwise: true,
+                                        animationEnabled: false,
+                                        startAngle: 180,
+                                        angleRange: 240,
+                                        animDurationMultiplier: .9,
+                                        customWidths: CustomSliderWidths(
+                                          trackWidth: 1,
+                                          progressBarWidth: 14,
+                                          shadowWidth: 58,
+                                        ),
+                                        infoProperties: InfoProperties(
+                                          topLabelText: scanBeacon.proximity,
+                                          modifier: (value) => '- ${value.toInt()} dBm',
+                                          bottomLabelText: 'RSSI',
+                                          topLabelStyle: const TextStyle(
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.w100,
+                                          ),
+                                          mainLabelStyle: const TextStyle(
+                                            fontSize: 20.0,
+                                            fontWeight: FontWeight.w100,
+                                          ),
+                                          bottomLabelStyle: const TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w200,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: S1),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Major : ${scanBeacon.major}',
+                                      style: Theme.of(context).textTheme.labelLarge,
+                                    ),
+                                    Text(
+                                      'Minor : ${scanBeacon.minor}',
+                                      style: Theme.of(context).textTheme.labelLarge,
+                                    ),
+                                    Text(
+                                      'Accuracy : ${scanBeacon.accuracy}m',
+                                      style: Theme.of(context).textTheme.labelLarge,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : const Center(
+                          child: Text('STOP'),
+                        ),
                 ),
-                GAP3,
-                const Tasks(),
-              ],
-            ),
-          ],
+              ),
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      ActionCard(
+                        icon: const Icon(
+                          Icons.settings_remote_sharp,
+                          // color: Colors.purpleAccent,
+                        ),
+                        label: 'Scan',
+                        content: '',
+                        value: ref
+                            .watch(beaconControllerProvider.select((e) => e.isScaning)),
+                        onTap: baeconAction.handleScanBeacon,
+                        onChanged: (e) => baeconAction.toggleSwitchScan(e),
+                        moreAction: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            clipBehavior: Clip.antiAlias,
+                            shape: SHERPE_TOP,
+                            constraints: BoxConstraints(
+                              maxHeight: MediaQuery.of(context).size.height * 0.5,
+                            ),
+                            builder: ((context) {
+                              return const SelectTime();
+                            }),
+                          );
+                        },
+                      ),
+                      ActionCard(
+                        icon: const Icon(
+                          Icons.broadcast_on_personal,
+                          // color: Colors.lightBlue,
+                        ),
+                        label: 'Broadcast',
+                        content: ref.watch(
+                                beaconControllerProvider.select((e) => e.isBroadcasting))
+                            ? ''
+                            : '',
+                        value: ref.watch(
+                            beaconControllerProvider.select((e) => e.isBroadcasting)),
+                        onChanged: (e) async => ref
+                            .read(beaconControllerProvider.notifier)
+                            .handleToggleBroadcast(context),
+                        onTap: () async => ref
+                            .read(beaconControllerProvider.notifier)
+                            .handleToggleBroadcast(context),
+                        moreAction: () {
+                          showModalBottomSheet(
+                            context: context,
+                            clipBehavior: Clip.antiAlias,
+                            shape: SHERPE_TOP,
+                            builder: ((context) {
+                              return const SelectBroadCast();
+                            }),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  GAP3,
+                  const Tasks(),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endContained,

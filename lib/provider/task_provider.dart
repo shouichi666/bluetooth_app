@@ -27,8 +27,7 @@ class TaskController extends StateNotifier<AsyncValue<List<Task>>> {
 
     _ref.listen(beaconControllerProvider, (previous, next) async {
       for (var task in state.value ?? []) {
-        pd(task);
-        if (!isRun(task) &&
+        if (isRun(task) &&
             next.isScaning &&
             (next.scanBeacon.proximity == 'immediate' ||
                 next.scanBeacon.proximity == 'near')) {
@@ -59,8 +58,6 @@ class TaskController extends StateNotifier<AsyncValue<List<Task>>> {
       ],
     );
 
-    pd(task.updateAt!.isBefore(DateTime.now()));
-
     _ref.read(localNotificationControllerProvider.notifier).show(
           id: task.id,
           title: task.label,
@@ -73,14 +70,14 @@ class TaskController extends StateNotifier<AsyncValue<List<Task>>> {
   bool isRun(Task task) {
     final now = DateTime.now();
 
-    final runAt = (task.runAt ?? DateTime.parse('3000-01-01 00:00:00'));
+    final runAt = task.runAt ?? now;
 
     final diff = runAt.difference(now);
 
     pd(diff.inHours);
 
-    final isRuntime23Before = -23 < diff.inHours;
+    final isRuntime23Before = diff.inHours < -23;
 
-    return task.isDoned && isRuntime23Before && runAt.isBefore(now);
+    return isRuntime23Before;
   }
 }
