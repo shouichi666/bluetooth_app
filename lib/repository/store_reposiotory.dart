@@ -92,10 +92,11 @@ class StoreRepository {
     return state;
   }
 
-  Future<List<Task>> relativeTasks() async {
-    final taskDoc = await _udoc.collection('task').get().then((e) => e.docs);
-
-    return taskDoc.map((e) => Task.fromJson(e.data())).toList();
+  Stream<List<Task>> relativeTasks() {
+    return _udoc
+        .collection('task')
+        .snapshots()
+        .map((e) => e.docs.map((e) => Task.fromJson(e.data())).toList());
   }
 
   postScanBeacon(ScanBeacon beacon) async {

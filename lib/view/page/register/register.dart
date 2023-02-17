@@ -354,7 +354,7 @@ class ScanResultTile extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodySmall?.apply(color: Colors.black),
+              style: Theme.of(context).textTheme.bodySmall,
               softWrap: true,
             ),
           ),
@@ -434,11 +434,11 @@ class ServiceTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const Text('Service'),
-            Text('0x${service.uuid.toString().toUpperCase().substring(4, 8)}',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
-                    ?.copyWith(color: Theme.of(context).textTheme.bodySmall?.color))
+            Text('uuid: ${service.uuid.toString()}'),
+            Text(
+              '0x${service.uuid.toString().toUpperCase().substring(4, 8)}',
+              style: Theme.of(context).textTheme.bodyLarge,
+            )
           ],
         ),
         children: characteristicTiles,
@@ -459,14 +459,14 @@ class CharacteristicTile extends StatelessWidget {
   final VoidCallback? onWritePressed;
   final VoidCallback? onNotificationPressed;
 
-  const CharacteristicTile(
-      {Key? key,
-      required this.characteristic,
-      required this.descriptorTiles,
-      this.onReadPressed,
-      this.onWritePressed,
-      this.onNotificationPressed})
-      : super(key: key);
+  const CharacteristicTile({
+    Key? key,
+    required this.characteristic,
+    required this.descriptorTiles,
+    this.onReadPressed,
+    this.onWritePressed,
+    this.onNotificationPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -482,11 +482,10 @@ class CharacteristicTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 const Text('Characteristic'),
-                Text('0x${characteristic.uuid.toString().toUpperCase().substring(4, 8)}',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(color: Theme.of(context).textTheme.bodySmall?.color))
+                Text(
+                  '0x${characteristic.uuid.toString().toUpperCase().substring(4, 8)}',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                )
               ],
             ),
             subtitle: Text(value.toString()),
@@ -538,11 +537,10 @@ class DescriptorTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const Text('Descriptor'),
-          Text('0x${descriptor.uuid.toString().toUpperCase().substring(4, 8)}',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: Theme.of(context).textTheme.bodySmall?.color))
+          Text(
+            '0x${descriptor.uuid.toString().toUpperCase().substring(4, 8)}',
+            style: Theme.of(context).textTheme.bodyLarge,
+          )
         ],
       ),
       subtitle: StreamBuilder<List<int>>(

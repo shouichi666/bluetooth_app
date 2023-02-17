@@ -19,9 +19,11 @@ class TaskController extends StateNotifier<AsyncValue<List<Task>>> {
   final Ref _ref;
 
   _init() async {
-    final fetch = await _ref.read(storeRepositoryProvider).relativeTasks();
+    final stream = _ref.read(storeRepositoryProvider).relativeTasks();
 
-    state = AsyncData(fetch);
+    stream.listen((event) {
+      state = AsyncData(event);
+    });
 
     _ref.listen(beaconControllerProvider, (previous, next) async {
       for (var task in state.value ?? []) {
